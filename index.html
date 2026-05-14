@@ -1902,18 +1902,8 @@ function showNotif(msg) {
   setTimeout(() => n.style.display = 'none', 3500);
 }
 
-/* ══════════
-   INIT
-══════════ */
-setLang('en');
-showLoading();
-loadListings().then(() => {
-  renderListings();
-  document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
-});
+/* functions defined below — INIT runs at end of script */
 
-/* ══════════════════════════════════════
-   i18n — THREE LANGUAGE SYSTEM
 ══════════════════════════════════════ */
 const translations = {
   en: {
@@ -2248,30 +2238,11 @@ document.getElementById('welcomeOverlay').addEventListener('click', function(e) 
 });
 
 /* ══════════════
-   REQUEST FORM
+   REQUEST FORM — handled by async submitRequest() in Supabase block above
 ══════════════ */
-function submitRequest(e) {
-  e.preventDefault();
-  const req = {
-    id: Date.now(),
-    name: document.getElementById('rName').value,
-    phone: document.getElementById('rPhone').value,
-    type: document.getElementById('rType').value,
-    city: document.getElementById('rCity').value,
-    budget: document.getElementById('rBudget').value,
-    date: document.getElementById('rDate').value,
-    notes: document.getElementById('rNotes').value,
-    submitted: new Date().toLocaleString(),
-    status: 'new'
-  };
-  const reqs = getRequests();
-  reqs.unshift(req);
-  saveRequests(reqs);
-  document.getElementById('reqSuccess').style.display = 'block';
-  e.target.querySelectorAll('input,select,textarea').forEach(el => el.value = '');
-  setTimeout(() => document.getElementById('reqSuccess').style.display = 'none', 5000);
-  showNotif('Request received! Ana will contact you soon.');
-}
+/* stubs so nothing crashes if called before Supabase loads */
+function getRequests() { return _requestsCache; }
+function saveRequests(arr) { _requestsCache = arr; }
 
 /* ══════════════════
    HAMBURGER MENU
@@ -2408,7 +2379,165 @@ function getTrans(listing, field) {
   return listing[field] || '';
 }
 
-/* ── end of admin functions ── */
+/* ══════════════════════════════════════
+   MANAGE LISTINGS — render + filter
+══════════════════════════════════════ */
+function renderAdminListings(filterQuery) {
+  const list = document.getElementById('adminListingsList');
+  if (!list) return;
+  let listings = getListings();
+  if (filterQuery && filterQuery.trim()) {
+    const q = filterQuery.trim().toLowerCase().replace(/^#/,'');
+    listings = listings.filter(l => (l.listingId||'').toLowerCase().includes(q));
+  }
+  if (!listings.length) {
+    list.innerHTML = filterQuery
+      ? `<p style="color:var(--muted);font-size:14px;padding:12px 0;">No listing found with ID "<strong>${filterQuery}</strong>"</p>`
+      : '<p style="color:var(--muted);font-size:14px;">No listings yet. Add your first one!</p>';
+    return;
+  }
+  list.innerHTML = listings.map(l => `
+    <div class="admin-listing-item">
+      <div class="ali-info">
+        <h4>${l.listingId?`<span style="font-family:monospace;background:var(--mist);color:var(--ocean);padding:2px 8px;border-radius:5px;font-size:11px;margin-right:6px;">#${l.listingId}</span>`:''}${l.title||'(no title)'} ${!l.active?'<span style="font-size:10px;background:#eee;color:#888;padding:2px 7px;border-radius:8px;">Hidden</span>':''}</h4>
+        <p>${l.city} · ${l.type} · £${l.price}/mo · ${l.beds} bed${l.title_tr?' · 🇹🇷':''}${l.title_ru?' · 🇷🇺':''}${l.landlordPhone?' · 🔒':''}</p>
+        ${l.landlordPhone?`<p style="font-size:11px;color:#856404;margin-top:3px;">🔒 ${l.landlordName||'Landlord'}: ${l.landlordPhone}</p>`:''}
+      </div>
+      <div class="ali-actions">
+        <button class="btn-edit" onclick="openEditModal(${l.id})">Edit</button>
+        <button class="btn-toggle" onclick="toggleListing(${l.id})">${l.active?'Hide':'Show'}</button>
+        <button class="btn-del" onclick="deleteListing(${l.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterAdminListings(val) {
+  const input = document.getElementById('adminIdSearch');
+  if (input && val === '') input.value = '';
+  renderAdminListings(val);
+}
+
+/* ══════════════════════════
+   EDIT MODAL
+══════════════════════════ */
+function openEditModal(id) {
+  const l = getListings().find(x => x.id === id);
+  if (!l) return;
+  const old = document.getElementById('editModalOverlay');
+  if (old) old.remove();
+  const payOpts = ['Monthly','3 Months','6 Months','1 Year'];
+  const payChecks = payOpts.map(p =>
+    `<label class="check-label"><input type="checkbox" value="${p}" ${(l.payments||[]).includes(p)?'checked':''}> ${p}</label>`
+  ).join('');
+  const esc = s => (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const modal = document.createElement('div');
+  modal.id = 'editModalOverlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;margin:20px auto;overflow:hidden;">
+      <div style="background:var(--navy);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fff;">Edit — ${l.listingId?'#'+l.listingId:l.title}</h2>
+        <button onclick="closeEditModal()" style="background:rgba(255,255,255,0.12);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">ID & CITY</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Listing ID</label>
+            <input id="eListingId" value="${esc(l.listingId)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:monospace;width:100%;outline:none;"></div>
+            <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">City</label>
+            <select id="eCity" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+              ${['Kyrenia','Famagusta','Nicosia','Iskele','Lefke','Other'].map(c=>`<option ${l.city===c?'selected':''}>${c}</option>`).join('')}
+            </select></div>
+          </div>
+        </div>
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">TITLE</div>
+          <div style="margin-bottom:10px;"><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">🇬🇧 English</label>
+          <input id="eTitle" value="${esc(l.title)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">🇹🇷 Turkish</label>
+            <input id="eTitleTr" value="${esc(l.title_tr)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;"></div>
+            <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">🇷🇺 Russian</label>
+            <input id="eTitleRu" value="${esc(l.title_ru)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;"></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Type</label>
+          <select id="eType" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+            ${['Villa','Flat','Penthouse','Studio','Room'].map(t=>`<option ${l.type===t?'selected':''}>${t}</option>`).join('')}
+          </select></div>
+          <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Bedrooms</label>
+          <select id="eBeds" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+            ${[{v:'Studio',n:'Studio'},{v:'1',n:'1 bed'},{v:'2',n:'2 beds'},{v:'3',n:'3 beds'},{v:'4+',n:'4+ beds'}].map(o=>`<option value="${o.v}" ${l.beds===o.v?'selected':''}>${o.n}</option>`).join('')}
+          </select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Monthly price (£)</label>
+          <input id="ePrice" type="number" value="${l.price}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;"></div>
+          <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Payment options</label>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">${payChecks}</div></div>
+        </div>
+        <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Address / area</label>
+        <input id="eAddress" value="${esc(l.address)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;"></div>
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">DESCRIPTION</div>
+          <div style="margin-bottom:10px;"><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">🇬🇧 English</label>
+          <textarea id="eDesc" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:70px;resize:vertical;font-family:'DM Sans',sans-serif;">${esc(l.desc)}</textarea></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">🇹🇷 Turkish</label>
+            <textarea id="eDescTr" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;">${esc(l.desc_tr)}</textarea></div>
+            <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">🇷🇺 Russian</label>
+            <textarea id="eDescRu" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;">${esc(l.desc_ru)}</textarea></div>
+          </div>
+        </div>
+        <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Photo URLs — one per line</label>
+        <textarea id="ePhotos" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;width:100%;outline:none;min-height:80px;resize:vertical;font-family:monospace;">${(l.photos&&l.photos.length?l.photos:l.photo?[l.photo]:[]).join('\n')}</textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Badge</label>
+          <select id="eBadge" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+            <option value="" ${!l.badge?'selected':''}>None</option>
+            <option value="new" ${l.badge==='new'?'selected':''}>New</option>
+            <option value="hot" ${l.badge==='hot'?'selected':''}>Hot deal</option>
+            <option value="student" ${l.badge==='student'?'selected':''}>Student friendly</option>
+          </select></div>
+          <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">WhatsApp number</label>
+          <input id="ePhone" value="${esc(l.phone)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;"></div>
+        </div>
+        <button onclick="saveEdit(${l.id})" style="background:var(--ocean);color:white;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">Save changes →</button>
+        <div style="background:#fff8e6;border:1.5px dashed #f5c842;border-radius:10px;padding:14px;">
+          <div style="font-size:11px;font-weight:600;color:#856404;letter-spacing:0.08em;margin-bottom:10px;">🔒 PRIVATE — ADMIN ONLY</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><label style="font-size:12px;color:#856404;display:block;margin-bottom:5px;">Landlord name</label>
+            <input id="eLandlordName" value="${esc(l.landlordName)}" style="border:1.5px solid #f5c842;border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;background:#fffdf0;"></div>
+            <div><label style="font-size:12px;color:#856404;display:block;margin-bottom:5px;">Landlord phone</label>
+            <input id="eLandlordPhone" value="${esc(l.landlordPhone)}" style="border:1.5px solid #f5c842;border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;background:#fffdf0;"></div>
+          </div>
+          <div style="margin-top:10px;"><label style="font-size:12px;color:#856404;display:block;margin-bottom:5px;">Private notes</label>
+          <textarea id="ePrivateNotes" style="border:1.5px solid #f5c842;border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;background:#fffdf0;">${esc(l.privateNotes)}</textarea></div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', ev => { if (ev.target === modal) closeEditModal(); });
+}
+
+function closeEditModal() {
+  const m = document.getElementById('editModalOverlay');
+  if (m) m.remove();
+}
+
+/* ══════════
+   INIT — must be last so all functions are defined
+══════════ */
+setLang('en');
+showLoading();
+loadListings().then(() => {
+  renderListings();
+  document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
+});
+
+/* ── end ── */
 </script>
 </body>
 </html>
