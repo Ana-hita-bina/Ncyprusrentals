@@ -1581,31 +1581,336 @@ footer a:hover { color: var(--sky); }
 <!-- Admin access: secret double-click on logo -->
 <script>
 /* ══════════════════════════════════════════
-   DATA LAYER — localStorage as mini backend
+   SUPABASE CONFIG
 ══════════════════════════════════════════ */
-function getListings() {
-  try { return JSON.parse(localStorage.getItem('ncr_listings') || '[]'); } catch(e) { return []; }
-}
-function saveListings(arr) { localStorage.setItem('ncr_listings', JSON.stringify(arr)); }
-function getRequests() {
-  try { return JSON.parse(localStorage.getItem('ncr_requests') || '[]'); } catch(e) { return []; }
-}
-function saveRequests(arr) { localStorage.setItem('ncr_requests', JSON.stringify(arr)); }
+const SB_URL  = 'https://bdsqjpdtqyuewrftlgkm.supabase.co';
+const SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkc3FqcGR0cXl1ZXdyZnRsZ2ttIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NTgxOTMsImV4cCI6MjA5NDMzNDE5M30.7VfCj2vuex0laTmiXusVYD6szkgJVH7rzq7RQEy4tW4';
+const HEADERS = { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
 
-/* Seed demo listings on first visit */
-function seedDemo() {
-  if (localStorage.getItem('ncr_seeded')) return;
-  const demos = [
-    { id: 1, title: "1+1 Flat, Harbour View", city: "Kyrenia", type: "Flat", beds: "1", price: 380, address: "Central Kyrenia, near the harbour", desc: "Bright furnished flat with balcony and sea views. Walking distance to restaurants and shops. Bills negotiable.", photo: "", photos: [], badge: "new", payments: ["Monthly","3 Months","6 Months"], phone: "+905391182520", active: true },
-    { id: 2, title: "Studio Near EMU Campus", city: "Famagusta", type: "Studio", beds: "Studio", price: 180, address: "5 min walk from Eastern Mediterranean University", desc: "Compact studio perfect for students. Furnished, WiFi included, secure building with 24h security.", photo: "", photos: [], badge: "student", payments: ["Monthly","3 Months"], phone: "+905391182520", active: true },
-    { id: 3, title: "3+1 Private Villa, Sea View", city: "Iskele", type: "Villa", beds: "3", price: 950, address: "Iskele Long Beach area, gated complex", desc: "Stunning 3-bedroom villa with private garden, pool access and breathtaking sea views. Perfect for families.", photo: "", photos: [], badge: "hot", payments: ["Monthly","3 Months","6 Months","1 Year"], phone: "+905391182520", active: true },
-    { id: 4, title: "2+1 Modern Flat", city: "Nicosia", type: "Flat", beds: "2", price: 450, address: "Near the city centre, Nicosia North", desc: "Spacious modern flat with new furniture, air conditioning in all rooms and covered parking.", photo: "", photos: [], badge: "", payments: ["Monthly","6 Months","1 Year"], phone: "+905391182520", active: true },
-    { id: 5, title: "Cosy Room in Shared House", city: "Famagusta", type: "Room", beds: "1", price: 120, address: "Near Necat British College, Famagusta", desc: "Private room in a friendly shared house. 3 housemates, shared kitchen and living room. All bills included.", photo: "", photos: [], badge: "student", payments: ["Monthly"], phone: "+905391182520", active: true },
-    { id: 6, title: "Luxury Penthouse, Old Town", city: "Kyrenia", type: "Penthouse", beds: "2", price: 1200, address: "Kyrenia Old Harbour, historic district", desc: "Exclusive penthouse with wraparound terrace, premium furnishing and panoramic harbour and mountain views.", photo: "", photos: [], badge: "hot", payments: ["Monthly","3 Months","6 Months","1 Year"], phone: "+905391182520", active: true },
-  ];
-  saveListings(demos);
-  localStorage.setItem('ncr_seeded', '1');
+/* ── low-level helpers ── */
+async function sbGet(table, params = '') {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}&order=created_at.desc`, { headers: HEADERS });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
 }
+async function sbInsert(table, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST', headers: { ...HEADERS, 'Prefer': 'return=representation' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbUpdate(table, id, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=representation' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbDelete(table, id) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'DELETE', headers: HEADERS
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+/* ── in-memory cache so UI stays fast ── */
+let _listingsCache = [];
+let _requestsCache = [];
+
+async function loadListings() {
+  try {
+    const rows = await sbGet('listings');
+    // normalise — Supabase returns snake_case, map to camelCase fields site uses
+    _listingsCache = rows.map(dbToLocal);
+    return _listingsCache;
+  } catch(e) {
+    console.warn('Supabase load failed, using cache', e);
+    return _listingsCache;
+  }
+}
+
+async function loadRequests() {
+  try {
+    _requestsCache = await sbGet('requests');
+    return _requestsCache;
+  } catch(e) { return _requestsCache; }
+}
+
+/* convert DB row → JS object the rest of the code already uses */
+function dbToLocal(r) {
+  return {
+    id:            r.id,
+    listingId:     r.listing_id  || '',
+    title:         r.title       || '',
+    title_tr:      r.title_tr    || '',
+    title_ru:      r.title_ru    || '',
+    city:          r.city        || '',
+    type:          r.type        || '',
+    beds:          r.beds        || '',
+    price:         r.price       || 0,
+    address:       r.address     || '',
+    desc:          r.description || '',
+    desc_tr:       r.desc_tr     || '',
+    desc_ru:       r.desc_ru     || '',
+    photo:         r.photo       || '',
+    photos:        r.photos      || [],
+    badge:         r.badge       || '',
+    payments:      r.payments    || [],
+    phone:         r.phone       || '',
+    landlordName:  r.landlord_name  || '',
+    landlordPhone: r.landlord_phone || '',
+    privateNotes:  r.private_notes  || '',
+    active:        r.active !== false,
+  };
+}
+
+/* convert JS object → DB row */
+function localToDb(l) {
+  return {
+    listing_id:     l.listingId    || '',
+    title:          l.title        || '',
+    title_tr:       l.title_tr     || '',
+    title_ru:       l.title_ru     || '',
+    city:           l.city         || '',
+    type:           l.type         || '',
+    beds:           l.beds         || '',
+    price:          l.price        || 0,
+    address:        l.address      || '',
+    description:    l.desc         || '',
+    desc_tr:        l.desc_tr      || '',
+    desc_ru:        l.desc_ru      || '',
+    photo:          l.photo        || '',
+    photos:         l.photos       || [],
+    badge:          l.badge        || '',
+    payments:       l.payments     || [],
+    phone:          l.phone        || '',
+    landlord_name:  l.landlordName  || '',
+    landlord_phone: l.landlordPhone || '',
+    private_notes:  l.privateNotes  || '',
+    active:         l.active !== false,
+  };
+}
+
+/* keep synchronous getListings() working for render functions */
+function getListings() { return _listingsCache; }
+
+/* ══════════════════════════════════════════
+   ADMIN CRUD — now async + Supabase
+══════════════════════════════════════════ */
+async function addListing(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-add');
+  btn.textContent = 'Saving…'; btn.disabled = true;
+
+  const payments = Array.from(document.querySelectorAll('#tabAdd input[type=checkbox]:checked')).map(c => c.value);
+  const photoRaw = document.getElementById('aPhoto').value;
+  const photos   = photoRaw.split('\n').map(u => u.trim()).filter(Boolean);
+  const rawId    = document.getElementById('aListingId').value.trim().toUpperCase().replace(/\s+/g,'');
+
+  if (_listingsCache.find(l => l.listingId === rawId)) {
+    alert('Listing ID ' + rawId + ' already exists. Use a unique ID.'); btn.textContent = 'Add listing to website →'; btn.disabled = false; return;
+  }
+
+  const row = localToDb({
+    listingId: rawId,
+    title:        document.getElementById('aTitle').value,
+    title_tr:     document.getElementById('aTitleTr').value,
+    title_ru:     document.getElementById('aTitleRu').value,
+    city:         document.getElementById('aCity').value,
+    type:         document.getElementById('aType').value,
+    beds:         document.getElementById('aBeds').value,
+    price:        parseFloat(document.getElementById('aPrice').value),
+    address:      document.getElementById('aAddress').value,
+    desc:         document.getElementById('aDesc').value,
+    desc_tr:      document.getElementById('aDescTr').value,
+    desc_ru:      document.getElementById('aDescRu').value,
+    photo:        photos[0] || '',
+    photos,
+    badge:        document.getElementById('aBadge').value,
+    payments,
+    phone:        document.getElementById('aPhone').value || '+905391182520',
+    landlordName: document.getElementById('aLandlordName').value,
+    landlordPhone:document.getElementById('aLandlordPhone').value,
+    privateNotes: document.getElementById('aPrivateNotes').value,
+    active: true,
+  });
+
+  try {
+    const [inserted] = await sbInsert('listings', row);
+    _listingsCache.unshift(dbToLocal(inserted));
+    e.target.reset();
+    showNotif('✅ Listing #' + rawId + ' is now live for everyone!');
+    renderListings();
+    document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
+    renderAdminListings();
+  } catch(err) {
+    alert('Error saving listing: ' + err.message);
+  }
+  btn.textContent = 'Add listing to website →'; btn.disabled = false;
+}
+
+async function saveEdit(dbId) {
+  const payments = Array.from(document.querySelectorAll('#editModalOverlay input[type=checkbox]:checked')).map(c => c.value);
+  const photos   = document.getElementById('ePhotos').value.split('\n').map(u => u.trim()).filter(Boolean);
+  const newId    = document.getElementById('eListingId').value.trim().toUpperCase().replace(/\s+/g,'');
+  const orig     = _listingsCache.find(l => l.id === dbId);
+
+  const duplicate = _listingsCache.find(l => l.listingId === newId && l.id !== dbId);
+  if (duplicate) { alert('Listing ID ' + newId + ' already exists.'); return; }
+
+  const updated = localToDb({
+    listingId:    newId || orig.listingId,
+    title:        document.getElementById('eTitle').value,
+    title_tr:     document.getElementById('eTitleTr').value,
+    title_ru:     document.getElementById('eTitleRu').value,
+    city:         document.getElementById('eCity').value,
+    type:         document.getElementById('eType').value,
+    beds:         document.getElementById('eBeds').value,
+    price:        parseFloat(document.getElementById('ePrice').value) || orig.price,
+    address:      document.getElementById('eAddress').value,
+    desc:         document.getElementById('eDesc').value,
+    desc_tr:      document.getElementById('eDescTr').value,
+    desc_ru:      document.getElementById('eDescRu').value,
+    photo:        photos[0] || orig.photo,
+    photos:       photos.length ? photos : orig.photos,
+    badge:        document.getElementById('eBadge').value,
+    payments,
+    phone:        document.getElementById('ePhone').value || orig.phone,
+    landlordName: document.getElementById('eLandlordName').value,
+    landlordPhone:document.getElementById('eLandlordPhone').value,
+    privateNotes: document.getElementById('ePrivateNotes').value,
+    active:       orig.active,
+  });
+
+  try {
+    await sbUpdate('listings', dbId, updated);
+    // update cache
+    const idx = _listingsCache.findIndex(l => l.id === dbId);
+    if (idx !== -1) _listingsCache[idx] = dbToLocal({ id: dbId, ...updated });
+    closeEditModal();
+    renderAdminListings();
+    renderListings();
+    showNotif('✅ Listing updated — live for everyone!');
+  } catch(err) {
+    alert('Error updating: ' + err.message);
+  }
+}
+
+async function toggleListing(dbId) {
+  const l = _listingsCache.find(x => x.id === dbId);
+  if (!l) return;
+  try {
+    await sbUpdate('listings', dbId, { active: !l.active });
+    l.active = !l.active;
+    renderAdminListings();
+    renderListings();
+  } catch(err) { alert('Error: ' + err.message); }
+}
+
+async function deleteListing(dbId) {
+  if (!confirm('Delete this listing? This cannot be undone.')) return;
+  try {
+    await sbDelete('listings', dbId);
+    _listingsCache = _listingsCache.filter(l => l.id !== dbId);
+    renderAdminListings();
+    renderListings();
+    showNotif('Listing deleted.');
+  } catch(err) { alert('Error: ' + err.message); }
+}
+
+async function submitRequest(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.btn-request');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  const row = {
+    name:      document.getElementById('rName').value,
+    phone:     document.getElementById('rPhone').value,
+    type:      document.getElementById('rType').value,
+    city:      document.getElementById('rCity').value,
+    budget:    document.getElementById('rBudget').value,
+    move_date: document.getElementById('rDate').value,
+    notes:     document.getElementById('rNotes').value,
+    status:    'new',
+  };
+  try {
+    await sbInsert('requests', row);
+    document.getElementById('reqSuccess').style.display = 'block';
+    e.target.querySelectorAll('input,select,textarea').forEach(el => el.value = '');
+    setTimeout(() => document.getElementById('reqSuccess').style.display = 'none', 5000);
+    showNotif('Request sent! Ana will contact you soon.');
+  } catch(err) {
+    alert('Could not send request: ' + err.message);
+  }
+  btn.textContent = 'Send my request — Ana will reply fast →'; btn.disabled = false;
+}
+
+async function openAdmin() {
+  document.getElementById('adminOverlay').style.display = 'flex';
+  renderAdminListings();
+  // load fresh requests from Supabase
+  try {
+    _requestsCache = await loadRequests();
+  } catch(e) {}
+  renderAdminRequests();
+  const newReqs = _requestsCache.filter(r => r.status === 'new');
+  document.getElementById('reqCount').textContent = newReqs.length || '';
+}
+
+async function renderAdminRequests() {
+  const list = document.getElementById('adminRequestsList');
+  const reqs = _requestsCache;
+  if (!reqs.length) { list.innerHTML = '<p style="color:var(--muted);font-size:14px;">No requests yet.</p>'; return; }
+  list.innerHTML = reqs.map(r => `
+    <div class="req-item">
+      <h4>${r.name} — ${r.phone} ${r.status === 'new' ? '<span class="req-badge">New</span>' : ''}</h4>
+      <p>Looking for: ${r.type} in ${r.city} · Budget: ${r.budget || 'Not specified'} · Move-in: ${r.move_date || 'Flexible'}</p>
+      ${r.notes ? `<p style="margin-top:4px;font-style:italic;">"${r.notes}"</p>` : ''}
+      <p style="margin-top:6px;font-size:11px;color:#aaa;">Received: ${r.created_at ? new Date(r.created_at).toLocaleString() : ''}</p>
+      <a href="https://wa.me/${(r.phone||'').replace(/\D/g,'')}" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;background:#25d366;color:white;padding:5px 14px;border-radius:6px;text-decoration:none;">Reply on WhatsApp</a>
+    </div>`).join('');
+  // mark all new → seen
+  const newOnes = reqs.filter(r => r.status === 'new');
+  if (newOnes.length) {
+    await Promise.all(newOnes.map(r => sbUpdate('requests', r.id, { status: 'seen' })));
+    newOnes.forEach(r => r.status = 'seen');
+    document.getElementById('reqCount').textContent = '';
+  }
+}
+
+/* ══════════════════════════════════════════
+   LOADING STATE helpers
+══════════════════════════════════════════ */
+function showLoading() {
+  document.getElementById('listingsGrid').innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+      <div style="display:inline-block;width:36px;height:36px;border:3px solid var(--mist);border-top-color:var(--ocean);border-radius:50%;animation:spin .8s linear infinite;"></div>
+      <p style="margin-top:16px;color:var(--muted);font-size:14px;">Loading properties…</p>
+    </div>`;
+}
+/* inject spin keyframe once */
+const _spinStyle = document.createElement('style');
+_spinStyle.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(_spinStyle);
+
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.style.display = 'block';
+  setTimeout(() => n.style.display = 'none', 3500);
+}
+
+/* ══════════
+   INIT
+══════════ */
+setLang('en');
+showLoading();
+loadListings().then(() => {
+  renderListings();
+  document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
+});
 
 /* ══════════════════════════════════════
    i18n — THREE LANGUAGE SYSTEM
@@ -2083,13 +2388,6 @@ document.getElementById('navLogo').addEventListener('click', function(e) {
 
 
 
-function openAdmin() {
-  document.getElementById('adminOverlay').style.display = 'flex';
-  renderAdminListings();
-  renderAdminRequests();
-  const reqs = getRequests().filter(r => r.status === 'new');
-  document.getElementById('reqCount').textContent = reqs.length || '';
-}
 function closeAdmin() {
   document.getElementById('adminOverlay').style.display = 'none';
   renderListings();
@@ -2390,49 +2688,7 @@ function saveEdit(id) {
   showNotif('Listing updated successfully!');
 }
 
-function toggleListing(id) {
-  const listings = getListings().map(l => l.id === id ? {...l, active: !l.active} : l);
-  saveListings(listings);
-  renderAdminListings();
-  renderListings();
-}
-function deleteListing(id) {
-  if (!confirm('Delete this listing?')) return;
-  saveListings(getListings().filter(l => l.id !== id));
-  renderAdminListings();
-  renderListings();
-}
-
-function renderAdminRequests() {
-  const list = document.getElementById('adminRequestsList');
-  const reqs = getRequests();
-  if (!reqs.length) { list.innerHTML = '<p style="color:var(--muted);font-size:14px;">No requests yet.</p>'; return; }
-  list.innerHTML = reqs.map(r => `
-    <div class="req-item">
-      <h4>${r.name} — ${r.phone} ${r.status === 'new' ? '<span class="req-badge">New</span>' : ''}</h4>
-      <p>Looking for: ${r.type} in ${r.city} · Budget: ${r.budget || 'Not specified'} · Move-in: ${r.date || 'Flexible'}</p>
-      ${r.notes ? `<p style="margin-top:4px;font-style:italic;">"${r.notes}"</p>` : ''}
-      <p style="margin-top:6px;font-size:11px;color:#aaa;">Received: ${r.submitted}</p>
-      <a href="https://wa.me/${r.phone.replace(/\D/g,'')}" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;background:#25d366;color:white;padding:5px 14px;border-radius:6px;text-decoration:none;">Reply on WhatsApp</a>
-    </div>`).join('');
-  // mark all as seen
-  saveRequests(reqs.map(r => ({...r, status: 'seen'})));
-  document.getElementById('reqCount').textContent = '';
-}
-
-function showNotif(msg) {
-  const n = document.getElementById('notif');
-  n.textContent = msg;
-  n.style.display = 'block';
-  setTimeout(() => n.style.display = 'none', 3500);
-}
-
-/* ══════════
-   INIT
-══════════ */
-seedDemo();
-setLang('en');
-renderListings();
+/* ── end of admin functions ── */
 </script>
 </body>
 </html>
