@@ -84,6 +84,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--offwhite); color: v
   position: absolute;
   inset: 0;
   background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235aacdb' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
 }
 .hero-badge {
   background: rgba(90,172,219,0.15);
@@ -1083,7 +1084,7 @@ footer a:hover { color: var(--sky); }
 <!-- ════════════════════════════════
      WELCOME POPUP (opens on load)
 ═══════════════════════════════════ -->
-<div class="overlay" id="welcomeOverlay">
+<div class="overlay" id="welcomeOverlay" style="display:none;">
   <div class="popup">
     <div class="popup-header">
       <button class="popup-close" onclick="closePopup()" aria-label="Close">✕</button>
@@ -1482,53 +1483,57 @@ footer a:hover { color: var(--sky); }
 <div class="main" id="request">
   <div class="request-section">
     <div class="request-left">
-      <h2>Can't find what<br>you need? <em>Tell us.</em></h2>
-      <p>Fill in your requirements and Ana will personally find the best options for you and get back within 24 hours — completely free.</p>
+      <h2 data-i18n="req_heading">Can't find what<br>you need? <em>Tell us.</em></h2>
+      <p data-i18n="req_p">Fill in your requirements and Ana will personally find the best options for you and get back within 24 hours — completely free.</p>
     </div>
     <div>
       <form class="request-form" onsubmit="submitRequest(event)">
         <div class="form-row">
           <div class="form-group">
-            <label>Your name *</label>
-            <input type="text" id="rName" placeholder="Ana / Mohammed / Daria..." required>
+            <label data-i18n="rform_name">Your name *</label>
+            <input type="text" id="rName" data-i18n-placeholder="rform_name_ph" placeholder="Ana / Mohammed / Daria..." required>
           </div>
           <div class="form-group">
-            <label>WhatsApp / Phone *</label>
-            <input type="tel" id="rPhone" placeholder="+90 or +44..." required>
+            <label data-i18n="rform_phone">WhatsApp / Phone *</label>
+            <input type="tel" id="rPhone" data-i18n-placeholder="rform_phone_ph" placeholder="+90 or +44..." required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Property type</label>
+            <label data-i18n="rform_type">Property type</label>
             <select id="rType">
-              <option>Studio</option><option>Apartment</option><option>Villa</option>
-              <option>Room</option><option>Any</option>
+              <option data-i18n="rform_opt_studio">Studio</option>
+              <option data-i18n="rform_opt_apartment">Apartment</option>
+              <option data-i18n="rform_opt_villa">Villa</option>
+              <option data-i18n="rform_opt_room">Room</option>
+              <option data-i18n="rform_opt_any">Any</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Preferred city</label>
+            <label data-i18n="rform_city">Preferred city</label>
             <select id="rCity">
               <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
-              <option>Iskele</option><option>No preference</option>
+              <option>Iskele</option>
+              <option data-i18n="rform_no_pref">No preference</option>
             </select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>Budget (£/month)</label>
-            <input type="text" id="rBudget" placeholder="e.g. £200–£400">
+            <label data-i18n="rform_budget">Budget (£/month)</label>
+            <input type="text" id="rBudget" data-i18n-placeholder="rform_budget_ph" placeholder="e.g. £200–£400">
           </div>
           <div class="form-group">
-            <label>Move-in date</label>
+            <label data-i18n="rform_date">Move-in date</label>
             <input type="date" id="rDate">
           </div>
         </div>
         <div class="form-group">
-          <label>Any specific requirements?</label>
-          <textarea id="rNotes" placeholder="Furnished, pets allowed, near university, parking, sea view..."></textarea>
+          <label data-i18n="rform_notes">Any specific requirements?</label>
+          <textarea id="rNotes" data-i18n-placeholder="rform_notes_ph" placeholder="Furnished, pets allowed, near university, parking, sea view..."></textarea>
         </div>
-        <button type="submit" class="btn-request">Send my request — Ana will reply fast →</button>
-        <div class="form-success" id="reqSuccess">Your request was sent! Ana will contact you within 24 hours.</div>
+        <button type="submit" class="btn-request" data-i18n="rform_submit">Send my request — Ana will reply fast →</button>
+        <div class="form-success" id="reqSuccess" data-i18n="rform_success">Your request was sent! Ana will contact you within 24 hours.</div>
       </form>
     </div>
   </div>
@@ -1844,7 +1849,7 @@ async function submitRequest(e) {
   } catch(err) {
     alert('Could not send request: ' + err.message);
   }
-  btn.textContent = 'Send my request — Ana will reply fast →'; btn.disabled = false;
+  btn.textContent = T('rform_submit'); btn.disabled = false;
 }
 
 async function openAdmin() {
@@ -1936,6 +1941,17 @@ const translations = {
     footer_desc: 'Your trusted local rental agent in Northern Cyprus. Finding homes for students, expats, locals & tourists.',
     footer_areas: 'Areas', footer_contact: 'Contact',
     stat_listings: 'Active listings', stat_cities: 'Cities covered', stat_response: 'Response time', stat_trust: 'Trusted agent',
+    req_heading: "Can't find what<br>you need? <em>Tell us.</em>",
+    rform_name: 'Your name *', rform_name_ph: 'Ana / Mohammed / Daria...',
+    rform_phone: 'WhatsApp / Phone *', rform_phone_ph: '+90 or +44...',
+    rform_type: 'Property type', rform_city: 'Preferred city',
+    rform_opt_studio: 'Studio', rform_opt_apartment: 'Apartment', rform_opt_villa: 'Villa', rform_opt_room: 'Room', rform_opt_any: 'Any',
+    rform_no_pref: 'No preference',
+    rform_budget: 'Budget (£/month)', rform_budget_ph: 'e.g. £200–£400',
+    rform_date: 'Move-in date',
+    rform_notes: 'Any specific requirements?', rform_notes_ph: 'Furnished, pets allowed, near university, parking, sea view...',
+    rform_submit: 'Send my request — Ana will reply fast →',
+    rform_success: 'Your request was sent! Ana will contact you within 24 hours.',
   },
   tr: {
     nav_listings: 'İlanlar', nav_request: 'Ev talep et', nav_about: 'Ana Hakkında',
@@ -1967,6 +1983,17 @@ const translations = {
     footer_desc: 'Kuzey Kıbrıs\'ta güvenilir yerel kiralama acenteniz. Öğrenciler, expat\'lar, yerliler ve turistler için ev buluyoruz.',
     footer_areas: 'Bölgeler', footer_contact: 'İletişim',
     stat_listings: 'Aktif ilan', stat_cities: 'Kapsanan şehir', stat_response: 'Yanıt süresi', stat_trust: 'Güvenilir acente',
+    req_heading: "İstediğinizi\nbulamıyor musunuz? <em>Bize söyleyin.</em>",
+    rform_name: 'Adınız *', rform_name_ph: 'Örn. Ayşe / Mehmet...',
+    rform_phone: 'WhatsApp / Telefon *', rform_phone_ph: '+90 veya +44...',
+    rform_type: 'Mülk tipi', rform_city: 'Tercih ettiğiniz şehir',
+    rform_opt_studio: 'Stüdyo', rform_opt_apartment: 'Daire', rform_opt_villa: 'Villa', rform_opt_room: 'Oda', rform_opt_any: 'Farketmez',
+    rform_no_pref: 'Fark etmez',
+    rform_budget: 'Bütçe (£/ay)', rform_budget_ph: 'ör. £200–£400',
+    rform_date: 'Taşınma tarihi',
+    rform_notes: 'Özel gereksinimleriniz var mı?', rform_notes_ph: 'Mobilyalı, evcil hayvan kabul, üniversiteye yakın, otopark, deniz manzarası...',
+    rform_submit: 'Talebimi gönder — Ana hızlıca yanıt verecek →',
+    rform_success: 'Talebiniz gönderildi! Ana 24 saat içinde sizinle iletişime geçecek.',
   },
   ru: {
     nav_listings: 'Объявления', nav_request: 'Запросить жильё', nav_about: 'Об Ане',
@@ -1998,6 +2025,17 @@ const translations = {
     footer_desc: 'Надёжный местный агент по аренде на Северном Кипре. Находим жильё для студентов, экспатов, местных и туристов.',
     footer_areas: 'Районы', footer_contact: 'Контакты',
     stat_listings: 'Активных объявлений', stat_cities: 'Городов', stat_response: 'Время ответа', stat_trust: 'Надёжный агент',
+    req_heading: "Не нашли нужное? <em>Напишите нам.</em>",
+    rform_name: 'Ваше имя *', rform_name_ph: 'Напр. Ана / Дмитрий...',
+    rform_phone: 'WhatsApp / Телефон *', rform_phone_ph: '+7 или +44...',
+    rform_type: 'Тип недвижимости', rform_city: 'Предпочтительный город',
+    rform_opt_studio: 'Студия', rform_opt_apartment: 'Квартира', rform_opt_villa: 'Вилла', rform_opt_room: 'Комната', rform_opt_any: 'Любой',
+    rform_no_pref: 'Без предпочтений',
+    rform_budget: 'Бюджет (£/месяц)', rform_budget_ph: 'напр. £200–£400',
+    rform_date: 'Дата заезда',
+    rform_notes: 'Особые пожелания?', rform_notes_ph: 'Мебель, можно с питомцами, рядом с университетом, парковка, вид на море...',
+    rform_submit: 'Отправить запрос — Ана ответит быстро →',
+    rform_success: 'Ваш запрос отправлен! Ана свяжется с вами в течение 24 часов.',
   }
 };
 
@@ -2532,6 +2570,8 @@ function closeEditModal() {
 ══════════ */
 setLang('en');
 showLoading();
+// Show welcome popup after a brief delay so the hero is visible first
+setTimeout(() => showFilterPopup(), 400);
 loadListings().then(() => {
   renderListings();
   document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
