@@ -787,7 +787,7 @@ footer a:hover { color: var(--sky); }
 .nav-mobile-menu {
   display: none;
   position: absolute;
-  top: 64px;
+  top: 56px;
   left: 0;
   right: 0;
   background: var(--white);
@@ -942,25 +942,137 @@ footer a:hover { color: var(--sky); }
 }
 .lightbox-thumb.active { border-color: var(--sky); }
 .lightbox-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
 /* ─── RESPONSIVE ─── */
-@media (max-width: 700px) {
-  .nav { padding: 0 16px; position: relative; }
-  .nav-links { display: none; }
-  .nav-hamburger { display: flex; }
-  .search-bar-wrap { padding: 12px 16px; top: 64px; }
-  .main { padding: 24px 16px; }
-  .stats-bar { gap: 28px; padding: 16px; }
-  .about-strip { padding: 24px; flex-direction: column; }
-  .about-contact { margin-left: 0; flex-direction: row; }
-  .request-section { padding: 28px 20px; }
-  .popup-body { padding: 20px 20px 24px; }
-  footer { padding: 28px 20px; }
-  .admin-row { grid-template-columns: 1fr; }
-  .lightbox-btn.prev { left: 4px; }
-  .lightbox-btn.next { right: 4px; }
-  .lightbox-thumb { width: 48px; height: 38px; }
+
+/* Tablet */
+@media (max-width: 900px) {
+  .request-section { grid-template-columns: 1fr; gap: 28px; }
+  .listings-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .about-strip { flex-direction: column; gap: 20px; padding: 28px 32px; }
+  .about-contact { margin-left: 0; flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  footer { grid-template-columns: 1fr 1fr; }
 }
 
+/* Mobile */
+@media (max-width: 700px) {
+  /* NAV */
+  .nav { padding: 0 16px; position: relative; height: 56px; }
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  .nav-mobile-menu { top: 56px; }
+
+  /* HERO */
+  .hero { padding: 36px 20px 32px; min-height: auto; }
+  .hero h1 { font-size: 30px; }
+  .hero p { font-size: 14px; margin-bottom: 24px; }
+  .hero-btns { flex-direction: column; align-items: center; gap: 10px; }
+  .hero-btns .btn-primary, .hero-btns .btn-outline { width: 100%; max-width: 320px; text-align: center; padding: 13px 20px; box-sizing: border-box; }
+
+  /* STATS */
+  .stats-bar { gap: 12px; padding: 14px 16px; justify-content: space-around; }
+  .stat-num { font-size: 20px; }
+  .stat-label { font-size: 10px; }
+
+  /* SEARCH BAR — NOT sticky on mobile */
+  .search-bar-wrap {
+    position: static !important;
+    top: auto !important;
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .search-quick { flex-direction: column; gap: 8px; }
+  .search-quick select { width: 100%; min-width: unset; font-size: 16px; padding: 12px 14px; }
+  #qSearch { font-size: 16px !important; padding: 12px 14px 12px 26px !important; }
+  .btn-search { width: 100%; padding: 13px; font-size: 15px; }
+  .btn-filter-full { width: 100%; padding: 13px; font-size: 15px; text-align: center; }
+
+  /* MAIN */
+  .main { padding: 20px 16px; }
+  .section-title { font-size: 22px; }
+
+  /* LISTINGS */
+  .listings-grid { grid-template-columns: 1fr; gap: 14px; }
+  .listing-card { border-radius: 12px; }
+  .listing-photo { height: 200px; }
+  .listing-body { padding: 14px 16px; }
+  .listing-title { font-size: 15px; }
+  .listing-tags { gap: 5px; }
+  .tag { font-size: 11px; }
+  .listing-footer-price { font-size: 16px; }
+  .btn-enquire { padding: 8px 14px; font-size: 13px; }
+
+  /* REQUEST SECTION */
+  .request-section { grid-template-columns: 1fr; padding: 24px 20px; gap: 24px; border-radius: 12px; }
+  .request-left h2 { font-size: 24px; }
+  .request-left p { font-size: 14px; }
+  /* Stack form rows on mobile — prevents overflow */
+  .form-row { grid-template-columns: 1fr; gap: 10px; }
+  /* font-size 16px prevents iOS auto-zoom on focus */
+  .form-group input, .form-group select, .form-group textarea { font-size: 16px; padding: 12px 14px; }
+  .btn-request { font-size: 15px; padding: 14px; }
+
+  /* ABOUT */
+  .about-strip { flex-direction: column; align-items: flex-start; padding: 20px; border-radius: 12px; gap: 16px; }
+  .about-contact { margin-left: 0; flex-direction: column; width: 100%; }
+  .contact-btn { justify-content: center; width: 100%; }
+
+  /* POPUP FILTER — slides up from bottom on mobile */
+  .overlay { padding: 0; align-items: flex-end; }
+  .popup { border-radius: 20px 20px 0 0; max-height: 92vh; width: 100%; }
+  .popup-header { padding: 18px 20px 14px; border-radius: 20px 20px 0 0; }
+  .popup-header h2 { font-size: 20px; }
+  .popup-header p { font-size: 13px; }
+  .popup-body { padding: 14px 16px 24px; }
+  .filter-step { margin-bottom: 18px; }
+  .filter-step-title { font-size: 11px; margin-bottom: 10px; }
+  .option-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .option-grid.wide { grid-template-columns: repeat(3, 1fr); }
+  .option-btn { padding: 10px 6px; border-radius: 8px; }
+  .option-btn .opt-icon { font-size: 20px; margin-bottom: 4px; }
+  .option-btn .opt-label { font-size: 11px; }
+  .budget-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .budget-row input { font-size: 16px; padding: 11px 12px; border-radius: 8px; }
+  .popup-footer { flex-direction: column-reverse; gap: 8px; padding-top: 4px; }
+  .btn-popup-search { padding: 14px; font-size: 15px; }
+  .btn-popup-clear { padding: 12px; font-size: 14px; }
+
+  /* LIGHTBOX */
+  .lightbox-overlay { padding: 8px; }
+  .lightbox-btn.prev { left: 0; width: 36px; height: 36px; font-size: 18px; }
+  .lightbox-btn.next { right: 0; width: 36px; height: 36px; font-size: 18px; }
+  .lightbox-thumb { width: 44px; height: 36px; }
+  .lightbox-title { font-size: 14px; }
+  .lightbox-counter { font-size: 12px; }
+
+  /* FOOTER */
+  footer { grid-template-columns: 1fr; padding: 24px 20px; gap: 20px; }
+  .footer-bottom { grid-column: 1; }
+
+  /* ADMIN */
+  .admin-row { grid-template-columns: 1fr; }
+  .admin-panel { border-radius: 12px; margin: 10px; }
+  .admin-content { padding: 14px 16px; }
+  .ali-actions { flex-wrap: wrap; gap: 6px; }
+  .admin-overlay { padding: 10px; }
+
+  /* LANG SWITCHER */
+  .lang-btn { font-size: 10px; padding: 3px 6px; }
+
+  /* ACTIVE FILTERS */
+  .filter-chip { font-size: 11px; }
+}
+
+/* Extra small phones */
+@media (max-width: 390px) {
+  .hero h1 { font-size: 24px; }
+  .option-grid { grid-template-columns: repeat(2, 1fr); }
+  .option-grid.wide { grid-template-columns: repeat(2, 1fr); }
+  .nav-logo { font-size: 16px; }
+  .stat-num { font-size: 17px; }
+}
 </style>
 </head>
 <body>
@@ -1216,13 +1328,42 @@ footer a:hover { color: var(--sky); }
             </div>
           </div>
           <div class="admin-group">
-            <label>WhatsApp contact number</label>
+            <label>WhatsApp contact number <span style="color:var(--muted);font-weight:400;">(shown on enquire button)</span></label>
             <input type="text" id="aPhone" placeholder="+90 539 118 2520">
+          </div>
+          <!-- PRIVATE ADMIN-ONLY SECTION -->
+          <div style="background:#fff8e6;border:1.5px dashed #f5c842;border-radius:10px;padding:14px;">
+            <div style="font-size:11px;font-weight:600;color:#856404;letter-spacing:0.08em;margin-bottom:8px;">🔒 PRIVATE — ADMIN ONLY (never shown to visitors)</div>
+            <div class="admin-row">
+              <div class="admin-group">
+                <label style="color:#856404;">Landlord name</label>
+                <input type="text" id="aLandlordName" placeholder="e.g. Mehmet Bey" style="border:1.5px solid #f5c842;background:#fffdf0;">
+              </div>
+              <div class="admin-group">
+                <label style="color:#856404;">Landlord phone / WhatsApp</label>
+                <input type="text" id="aLandlordPhone" placeholder="+90 533 ..." style="border:1.5px solid #f5c842;background:#fffdf0;">
+              </div>
+            </div>
+            <div class="admin-group" style="margin-top:10px;">
+              <label style="color:#856404;">Private notes (contract terms, key location, commission, etc.)</label>
+              <textarea id="aPrivateNotes" placeholder="e.g. 1 month commission. Key with building manager. Contract signed 3+3..." style="border:1.5px solid #f5c842;background:#fffdf0;min-height:60px;"></textarea>
+            </div>
           </div>
           <button type="submit" class="btn-add">Add listing to website →</button>
         </form>
       </div>
       <div id="tabManage" style="display:none;">
+        <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center;">
+          <div style="position:relative;flex:1;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;font-family:monospace;">#</span>
+            <input type="text" id="adminIdSearch" placeholder="Search by listing ID e.g. KYR001"
+              oninput="filterAdminListings(this.value)"
+              style="border:1.5px solid var(--border);border-radius:8px;padding:9px 12px 9px 26px;font-size:13px;font-family:monospace;width:100%;outline:none;transition:border-color .2s;letter-spacing:0.04em;"
+              onfocus="this.style.borderColor='var(--ocean)'"
+              onblur="this.style.borderColor='var(--border)'">
+          </div>
+          <button onclick="filterAdminListings('')" style="background:var(--mist);color:var(--muted);border:1px solid var(--border);padding:9px 14px;border-radius:8px;font-size:12px;cursor:pointer;" title="Clear search">✕ Clear</button>
+        </div>
         <div class="admin-listings-list" id="adminListingsList"></div>
       </div>
       <div id="tabRequests" style="display:none;">
@@ -1292,6 +1433,12 @@ footer a:hover { color: var(--sky); }
 <!-- SEARCH BAR -->
 <div class="search-bar-wrap">
   <div class="search-quick">
+    <div style="position:relative;flex:1.5;min-width:160px;">
+      <input type="text" id="qSearch" placeholder="🔍 Search by name, area, city..." oninput="quickSearch()" autocomplete="off"
+        style="border:1px solid var(--border);border-radius:8px;padding:9px 14px 9px 14px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--offwhite);outline:none;width:100%;transition:border-color .2s;"
+        onfocus="this.style.borderColor='var(--ocean)';this.style.background='white'"
+        onblur="this.style.borderColor='var(--border)';this.style.background='var(--offwhite)'">
+    </div>
     <select id="qCity" onchange="quickSearch()">
       <option value="">All cities</option>
       <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
@@ -1637,10 +1784,12 @@ function applyFilters() {
 }
 
 function quickSearch() {
+  const query = (document.getElementById('qSearch').value || '').trim().toLowerCase();
   const city = document.getElementById('qCity').value;
   const type = document.getElementById('qType').value;
   const budgetMax = parseFloat(document.getElementById('qBudget').value) || Infinity;
   const criteria = {
+    query,
     cities: city ? [city] : [],
     types: type ? [type] : [],
     budgetMax
@@ -1673,6 +1822,8 @@ function clearAllFilters() {
   document.getElementById('qCity').value = '';
   document.getElementById('qType').value = '';
   document.getElementById('qBudget').value = '';
+  const qs = document.getElementById('qSearch');
+  if (qs) qs.value = '';
   renderListings({});
   renderActiveFilters({});
 }
@@ -1696,6 +1847,19 @@ function renderListings(filters = {}) {
   if (filters.city && !filters.cities) listings = listings.filter(l => l.city === filters.city);
   if (filters.budgetMin) listings = listings.filter(l => l.price >= filters.budgetMin);
   if (filters.budgetMax && filters.budgetMax !== Infinity) listings = listings.filter(l => l.price <= filters.budgetMax);
+  // live text search — matches title, city, address, listing ID
+  if (filters.query && filters.query.length > 0) {
+    const q = filters.query.toLowerCase();
+    listings = listings.filter(l =>
+      (l.title || '').toLowerCase().includes(q) ||
+      (l.title_tr || '').toLowerCase().includes(q) ||
+      (l.title_ru || '').toLowerCase().includes(q) ||
+      (l.city || '').toLowerCase().includes(q) ||
+      (l.address || '').toLowerCase().includes(q) ||
+      (l.listingId || '').toLowerCase().includes(q) ||
+      (l.type || '').toLowerCase().includes(q)
+    );
+  }
 
   document.getElementById('statListings').textContent = getListings().filter(l => l.active).length;
   countEl.textContent = listings.length + ' ' + T('props_found');
@@ -1974,6 +2138,9 @@ function addListing(e) {
     badge: document.getElementById('aBadge').value,
     payments,
     phone: document.getElementById('aPhone').value || '+905391182520',
+    landlordName: document.getElementById('aLandlordName').value,
+    landlordPhone: document.getElementById('aLandlordPhone').value,
+    privateNotes: document.getElementById('aPrivateNotes').value,
     active: true
   };
   const listings = getListings();
@@ -1985,15 +2152,28 @@ function addListing(e) {
   document.getElementById('statListings').textContent = getListings().filter(l => l.active).length;
 }
 
-function renderAdminListings() {
+function renderAdminListings(filterQuery) {
   const list = document.getElementById('adminListingsList');
-  const listings = getListings();
-  if (!listings.length) { list.innerHTML = '<p style="color:var(--muted);font-size:14px;">No listings yet. Add your first one!</p>'; return; }
+  let listings = getListings();
+  // filter by ID search if query provided
+  if (filterQuery && filterQuery.trim()) {
+    const q = filterQuery.trim().toLowerCase().replace(/^#/,'');
+    listings = listings.filter(l =>
+      (l.listingId || '').toLowerCase().includes(q)
+    );
+  }
+  if (!listings.length) {
+    list.innerHTML = filterQuery
+      ? `<p style="color:var(--muted);font-size:14px;padding:12px 0;">No listing found with ID containing "<strong>${filterQuery}</strong>"</p>`
+      : '<p style="color:var(--muted);font-size:14px;">No listings yet. Add your first one!</p>';
+    return;
+  }
   list.innerHTML = listings.map(l => `
     <div class="admin-listing-item">
       <div class="ali-info">
         <h4>${l.listingId ? `<span style="font-family:monospace;background:var(--mist);color:var(--ocean);padding:2px 8px;border-radius:5px;font-size:11px;margin-right:6px;">#${l.listingId}</span>` : ''}${l.title} ${!l.active ? '<span style="font-size:10px;background:#eee;color:#888;padding:2px 7px;border-radius:8px;">Hidden</span>' : ''}</h4>
-        <p>${l.city} · ${l.type} · £${l.price}/mo · ${l.beds} bed${l.title_tr ? ' · 🇹🇷' : ''}${l.title_ru ? ' · 🇷🇺' : ''}</p>
+        <p>${l.city} · ${l.type} · £${l.price}/mo · ${l.beds} bed${l.title_tr ? ' · 🇹🇷' : ''}${l.title_ru ? ' · 🇷🇺' : ''}${l.landlordPhone ? ' · 🔒' : ''}</p>
+        ${l.landlordPhone ? `<p style="font-size:11px;color:#856404;margin-top:3px;">🔒 ${l.landlordName || 'Landlord'}: ${l.landlordPhone}</p>` : ''}
       </div>
       <div class="ali-actions">
         <button class="btn-edit" onclick="openEditModal(${l.id})">Edit</button>
@@ -2001,6 +2181,12 @@ function renderAdminListings() {
         <button class="btn-del" onclick="deleteListing(${l.id})">Delete</button>
       </div>
     </div>`).join('');
+}
+
+function filterAdminListings(val) {
+  const input = document.getElementById('adminIdSearch');
+  if (input && val === '') input.value = '';
+  renderAdminListings(val);
 }
 
 /* ══════════════════════════
@@ -2134,6 +2320,24 @@ function openEditModal(id) {
         </div>
 
         <button onclick="saveEdit(${l.id})" style="background:var(--ocean);color:white;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;" onmouseover="this.style.background='var(--navy)'" onmouseout="this.style.background='var(--ocean)'">Save changes →</button>
+
+        <div style="background:#fff8e6;border:1.5px dashed #f5c842;border-radius:10px;padding:14px;margin-top:4px;">
+          <div style="font-size:11px;font-weight:600;color:#856404;letter-spacing:0.08em;margin-bottom:10px;">🔒 PRIVATE — ADMIN ONLY</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="admin-group">
+              <label style="color:#856404;">Landlord name</label>
+              <input id="eLandlordName" value="${(l.landlordName||'').replace(/"/g,'&quot;')}" placeholder="e.g. Mehmet Bey" style="border:1.5px solid #f5c842;border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;background:#fffdf0;">
+            </div>
+            <div class="admin-group">
+              <label style="color:#856404;">Landlord phone</label>
+              <input id="eLandlordPhone" value="${(l.landlordPhone||'').replace(/"/g,'&quot;')}" placeholder="+90 533 ..." style="border:1.5px solid #f5c842;border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;background:#fffdf0;">
+            </div>
+          </div>
+          <div class="admin-group" style="margin-top:10px;">
+            <label style="color:#856404;">Private notes</label>
+            <textarea id="ePrivateNotes" style="border:1.5px solid #f5c842;border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;background:#fffdf0;">${l.privateNotes||''}</textarea>
+          </div>
+        </div>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -2174,6 +2378,9 @@ function saveEdit(id) {
       badge: document.getElementById('eBadge').value,
       payments,
       phone: document.getElementById('ePhone').value || l.phone,
+      landlordName: document.getElementById('eLandlordName').value,
+      landlordPhone: document.getElementById('eLandlordPhone').value,
+      privateNotes: document.getElementById('ePrivateNotes').value,
     };
   });
   saveListings(listings);
