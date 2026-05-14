@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N.Cyprus.Rentals — Find Your Home in Northern Cyprus</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean: #1a6fa8;
+  --sky: #5aacdb;
+  --mist: #e8f4fb;
+  --navy: #1a3a52;
+  --gold: #f5c842;
+  --white: #ffffff;
+  --offwhite: #f7f9fc;
+  --text: #1a2733;
+  --muted: #6b8799;
+  --border: #d0e5f2;
+  --success: #2ecc71;
+  --radius: 12px;
+  --shadow: 0 4px 24px rgba(26,63,82,0.10);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--offwhite); color: var(--text); min-height: 100vh; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--mist); }
+::-webkit-scrollbar-thumb { background: var(--sky); border-radius: 3px; }
+
+/* ─── NAVBAR ─── */
+.nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--ocean); }
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--ocean); }
+.nav-cta {
+  background: var(--ocean);
+  color: var(--white) !important;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px !important;
+}
+.nav-cta:hover { background: var(--navy) !important; color: var(--white) !important; }
+
+/* ─── HERO ─── */
+.hero {
+  background: var(--navy);
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235aacdb' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-badge {
+  background: rgba(90,172,219,0.15);
+  border: 1px solid rgba(90,172,219,0.3);
+  color: var(--sky);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 16px;
+  max-width: 700px;
+}
+.hero h1 em { color: var(--gold); font-style: normal; }
+.hero p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 36px;
+  max-width: 500px;
+  line-height: 1.6;
+}
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.btn-primary {
+  background: var(--ocean);
+  color: var(--white);
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { background: var(--sky); transform: translateY(-1px); }
+.btn-outline {
+  background: transparent;
+  color: var(--white);
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.08); }
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  background: var(--ocean);
+  padding: 16px 40px;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+.stat { text-align: center; }
+.stat-num { font-size: 24px; font-weight: 500; color: var(--white); font-family: 'Cormorant Garamond', serif; }
+.stat-label { font-size: 11px; color: rgba(255,255,255,0.7); letter-spacing: 0.08em; margin-top: 2px; }
+
+/* ─── SEARCH BAR (inline, below hero) ─── */
+.search-bar-wrap {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 64px;
+  z-index: 90;
+}
+.search-quick {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.search-quick select, .search-quick input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--offwhite);
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+  flex: 1;
+  transition: border-color .2s;
+}
+.search-quick select:focus, .search-quick input:focus { border-color: var(--ocean); background: var(--white); }
+.btn-search {
+  background: var(--ocean);
+  color: var(--white);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s;
+}
+.btn-search:hover { background: var(--navy); }
+.btn-filter-full {
+  background: var(--mist);
+  color: var(--ocean);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s;
+}
+.btn-filter-full:hover { background: var(--border); }
+
+/* ─── MAIN LAYOUT ─── */
+.main { max-width: 1200px; margin: 0 auto; padding: 36px 24px; }
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--navy);
+}
+.section-count { font-size: 14px; color: var(--muted); }
+
+/* ─── LISTINGS GRID ─── */
+.listings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 22px;
+}
+.listing-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+}
+.listing-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.listing-photo {
+  width: 100%;
+  height: 190px;
+  background: var(--mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.listing-photo img { width: 100%; height: 100%; object-fit: cover; }
+.listing-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.listing-photo-placeholder svg { opacity: 0.4; }
+.listing-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+.badge-new { background: var(--gold); color: var(--navy); }
+.badge-hot { background: #ff6b6b; color: white; }
+.badge-student { background: var(--ocean); color: white; }
+.listing-price-tag {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: var(--navy);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: 'Cormorant Garamond', serif;
+}
+.listing-body { padding: 16px 18px; }
+.listing-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.listing-location {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.listing-location svg { flex-shrink: 0; }
+.listing-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--mist);
+  color: var(--ocean);
+  border: 1px solid var(--border);
+}
+.listing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.listing-footer-price { font-size: 18px; font-weight: 500; color: var(--ocean); font-family: 'Cormorant Garamond', serif; }
+.listing-footer-price span { font-size: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 400; }
+.btn-enquire {
+  background: var(--ocean);
+  color: var(--white);
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .2s;
+}
+.btn-enquire:hover { background: var(--navy); }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-state h3 { font-size: 22px; font-family: 'Cormorant Garamond', serif; color: var(--navy); margin-bottom: 10px; }
+.empty-state p { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+
+/* ─── REQUEST FORM SECTION ─── */
+.request-section {
+  background: var(--navy);
+  border-radius: 16px;
+  padding: 48px;
+  margin: 48px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+@media (max-width: 700px) { .request-section { grid-template-columns: 1fr; padding: 32px 24px; } }
+.request-left h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.request-left h2 em { color: var(--gold); font-style: normal; }
+.request-left p { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+.request-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 0.06em; }
+.form-group input, .form-group select, .form-group textarea {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--white);
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.35); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--sky); }
+.form-group select option { background: var(--navy); color: var(--white); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.btn-request {
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-request:hover { opacity: 0.9; transform: translateY(-1px); }
+.form-success {
+  background: rgba(46,204,113,0.15);
+  border: 1px solid rgba(46,204,113,0.4);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  color: #2ecc71;
+  font-size: 15px;
+  display: none;
+}
+
+/* ─── POPUP OVERLAY ─── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,24,36,0.75);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn .3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.popup {
+  background: var(--white);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp .35s ease;
+  box-shadow: 0 20px 60px rgba(10,24,36,0.35);
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.popup-header {
+  background: var(--navy);
+  padding: 28px 32px 24px;
+  border-radius: 20px 20px 0 0;
+  position: relative;
+}
+.popup-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.popup-header p { font-size: 14px; color: rgba(255,255,255,0.6); }
+.popup-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+}
+.popup-close:hover { background: rgba(255,255,255,0.25); }
+.popup-body { padding: 28px 32px 32px; }
+
+.filter-step { margin-bottom: 24px; }
+.filter-step-title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: var(--ocean);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.option-grid.wide { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+.option-btn {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+}
+.option-btn .opt-icon { font-size: 22px; margin-bottom: 5px; }
+.option-btn .opt-label { font-size: 12px; color: var(--text); font-weight: 400; line-height: 1.3; }
+.option-btn:hover { border-color: var(--sky); background: var(--mist); }
+.option-btn.active { border-color: var(--ocean); background: var(--mist); }
+.option-btn.active .opt-label { color: var(--ocean); font-weight: 500; }
+
+.budget-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.budget-row input, .budget-row select,
+.filter-select {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  width: 100%;
+  transition: border-color .2s;
+}
+.budget-row input:focus, .budget-row select:focus, .filter-select:focus { border-color: var(--ocean); }
+.filter-select { cursor: pointer; }
+
+.popup-footer {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+}
+.btn-popup-search {
+  flex: 1;
+  background: var(--ocean);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .2s, transform .15s;
+}
+.btn-popup-search:hover { background: var(--navy); transform: translateY(-1px); }
+.btn-popup-clear {
+  background: var(--offwhite);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .2s;
+}
+.btn-popup-clear:hover { background: var(--border); }
+
+/* ─── ACTIVE FILTERS ─── */
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.filter-chip {
+  background: var(--mist);
+  border: 1px solid var(--border);
+  color: var(--ocean);
+  font-size: 12px;
+  padding: 5px 12px 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-chip-remove { cursor: pointer; opacity: 0.6; font-size: 14px; line-height: 1; }
+.filter-chip-remove:hover { opacity: 1; }
+
+/* ─── ABOUT STRIP ─── */
+.about-strip {
+  background: var(--mist);
+  border-radius: 16px;
+  padding: 36px 48px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin: 48px 0;
+  flex-wrap: wrap;
+}
+.about-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--ocean);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px;
+  color: var(--white);
+  flex-shrink: 0;
+  border: 3px solid var(--white);
+}
+.about-text h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--navy); margin-bottom: 6px; }
+.about-text p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 500px; }
+.about-contact {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity .2s;
+  border: none;
+}
+.contact-btn:hover { opacity: 0.85; }
+.wa-btn { background: #25d366; color: white; }
+.ig-btn { background: #e1306c; color: white; }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--navy);
+  color: rgba(255,255,255,0.6);
+  padding: 36px 40px 24px;
+  margin-top: 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 36px;
+}
+@media (max-width: 700px) { footer { grid-template-columns: 1fr; } }
+footer h4 { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--white); margin-bottom: 12px; }
+footer p, footer a { font-size: 13px; line-height: 2; color: rgba(255,255,255,0.55); text-decoration: none; display: block; }
+footer a:hover { color: var(--sky); }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 16px;
+  margin-top: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  grid-column: 1 / -1;
+}
+
+/* ─── ADMIN PANEL ─── */
+.admin-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 9999;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+.admin-panel {
+  background: var(--white);
+  border-radius: 16px;
+  max-width: 720px;
+  width: 100%;
+  margin: 20px auto;
+  overflow: hidden;
+}
+.admin-header {
+  background: var(--navy);
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--white); }
+.admin-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.admin-tab {
+  padding: 12px 24px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+}
+.admin-tab.active { color: var(--ocean); border-bottom-color: var(--ocean); }
+.admin-content { padding: 24px 28px; }
+.admin-form { display: flex; flex-direction: column; gap: 14px; }
+.admin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.admin-group { display: flex; flex-direction: column; gap: 6px; }
+.admin-group label { font-size: 12px; font-weight: 500; color: var(--text); letter-spacing: 0.04em; }
+.admin-group input, .admin-group select, .admin-group textarea {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--offwhite);
+  outline: none;
+  transition: border-color .2s;
+}
+.admin-group input:focus, .admin-group select:focus, .admin-group textarea:focus { border-color: var(--ocean); background: var(--white); }
+.admin-group textarea { resize: vertical; min-height: 70px; }
+.admin-checkboxes { display: flex; flex-wrap: wrap; gap: 10px; }
+.check-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); cursor: pointer; }
+.btn-add { background: var(--ocean); color: white; border: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .2s; }
+.btn-add:hover { background: var(--navy); }
+.admin-listings-list { display: flex; flex-direction: column; gap: 10px; }
+.admin-listing-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ali-info h4 { font-size: 14px; font-weight: 500; color: var(--navy); }
+.ali-info p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.ali-actions { display: flex; gap: 8px; }
+.btn-edit { background: #e8f4fb; color: var(--ocean); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: background .2s; font-weight: 500; }
+.btn-edit:hover { background: var(--border); }
+.btn-del { background: #fff0f0; color: #cc3333; border: 1px solid #ffcccc; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: background .2s; }
+.btn-del:hover { background: #ffcccc; }
+.btn-toggle { background: var(--mist); color: var(--ocean); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: background .2s; }
+.btn-toggle:hover { background: var(--border); }
+.admin-requests-list { display: flex; flex-direction: column; gap: 10px; }
+.req-item { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--offwhite); }
+.req-item h4 { font-size: 14px; font-weight: 500; color: var(--navy); margin-bottom: 4px; }
+.req-item p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.req-badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; background: #fff3cd; color: #856404; margin-left: 8px; }
+
+/* ─── NOTIFICATION ─── */
+.notif {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: var(--navy);
+  color: white;
+  padding: 14px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  z-index: 99999;
+  display: none;
+  animation: slideIn .3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ─── LANG SWITCHER ─── */
+.lang-switcher { display: flex; align-items: center; gap: 2px; background: var(--offwhite); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+.lang-btn { background: none; border: none; font-size: 11px; font-weight: 500; color: var(--muted); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; letter-spacing: 0.04em; }
+.lang-btn.active { background: var(--ocean); color: white; }
+.lang-btn:hover:not(.active) { background: var(--border); color: var(--text); }
+
+/* ─── HAMBURGER MENU ─── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background .2s;
+}
+.nav-hamburger:hover { background: var(--mist); }
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--navy);
+  border-radius: 2px;
+  transition: all .3s;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-mobile-menu {
+  display: none;
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px 20px;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 99;
+  box-shadow: 0 8px 24px rgba(26,63,82,0.10);
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-menu a {
+  font-size: 15px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 11px 12px;
+  border-radius: 8px;
+  transition: background .2s;
+  font-weight: 400;
+}
+.nav-mobile-menu a:hover { background: var(--mist); color: var(--ocean); }
+.nav-mobile-menu .nav-cta {
+  background: var(--ocean) !important;
+  color: var(--white) !important;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.nav-mobile-menu .wa-link { color: #25d366 !important; font-weight: 500; }
+
+/* ─── LIGHTBOX ─── */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,15,25,0.95);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  flex-direction: column;
+}
+.lightbox-overlay.open { display: flex; }
+.lightbox-main {
+  position: relative;
+  max-width: 880px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+}
+.lightbox-img-wrap {
+  width: 100%;
+  max-height: 65vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-img-wrap img {
+  max-width: 100%;
+  max-height: 65vh;
+  border-radius: 10px;
+  object-fit: contain;
+  display: block;
+}
+.lightbox-img-placeholder {
+  width: 100%;
+  max-height: 65vh;
+  min-height: 300px;
+  background: var(--navy);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.4);
+  font-size: 14px;
+}
+.lightbox-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.lightbox-btn:hover { background: rgba(255,255,255,0.25); }
+.lightbox-btn.prev { left: -22px; }
+.lightbox-btn.next { right: -22px; }
+.lightbox-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+  z-index: 2;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.25); }
+.lightbox-info {
+  text-align: center;
+  margin-top: 14px;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 880px;
+}
+.lightbox-title { font-size: 16px; font-weight: 500; color: white; margin-bottom: 4px; font-family: 'Cormorant Garamond', serif; }
+.lightbox-counter { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+.lightbox-thumbs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 880px;
+  padding: 0 8px;
+}
+.lightbox-thumb {
+  width: 60px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color .2s;
+  flex-shrink: 0;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-thumb.active { border-color: var(--sky); }
+.lightbox-thumb img { width: 100%; height: 100%; object-fit: cover; }
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  .nav { padding: 0 16px; position: relative; }
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  .search-bar-wrap { padding: 12px 16px; top: 64px; }
+  .main { padding: 24px 16px; }
+  .stats-bar { gap: 28px; padding: 16px; }
+  .about-strip { padding: 24px; flex-direction: column; }
+  .about-contact { margin-left: 0; flex-direction: row; }
+  .request-section { padding: 28px 20px; }
+  .popup-body { padding: 20px 20px 24px; }
+  footer { padding: 28px 20px; }
+  .admin-row { grid-template-columns: 1fr; }
+  .lightbox-btn.prev { left: 4px; }
+  .lightbox-btn.next { right: 4px; }
+  .lightbox-thumb { width: 48px; height: 38px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<!-- ════════════════════════════════
+     WELCOME POPUP (opens on load)
+═══════════════════════════════════ -->
+<div class="overlay" id="welcomeOverlay">
+  <div class="popup">
+    <div class="popup-header">
+      <button class="popup-close" onclick="closePopup()" aria-label="Close">✕</button>
+      <h2 data-i18n="popup_title">Find your perfect home</h2>
+      <p data-i18n="popup_sub">Select as many options as you like — we'll show all matching properties</p>
+    </div>
+    <div class="popup-body">
+
+      <div class="filter-step">
+        <div class="filter-step-title" data-i18n="filter_type">What type of property?</div>
+        <div class="option-grid">
+          <div class="option-btn" onclick="toggleMultiFilter(this,'type','Villa')" data-val="Villa">
+            <div class="opt-icon">🏡</div><div class="opt-label" data-i18n="type_villa">Villa</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'type','Flat')" data-val="Flat">
+            <div class="opt-icon">🏢</div><div class="opt-label" data-i18n="type_flat">Flat</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'type','Penthouse')" data-val="Penthouse">
+            <div class="opt-icon">✨</div><div class="opt-label" data-i18n="type_penthouse">Penthouse</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-step">
+        <div class="filter-step-title" data-i18n="filter_beds">How many bedrooms?</div>
+        <div class="option-grid">
+          <div class="option-btn" onclick="toggleMultiFilter(this,'beds','Studio')" data-val="Studio">
+            <div class="opt-icon">🛏</div><div class="opt-label" data-i18n="beds_studio">Studio</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'beds','1')" data-val="1">
+            <div class="opt-icon">1️⃣</div><div class="opt-label" data-i18n="beds_1">1 bed</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'beds','2')" data-val="2">
+            <div class="opt-icon">2️⃣</div><div class="opt-label" data-i18n="beds_2">2 beds</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'beds','3')" data-val="3">
+            <div class="opt-icon">3️⃣</div><div class="opt-label" data-i18n="beds_3">3 beds</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'beds','4+')" data-val="4+">
+            <div class="opt-icon">🏠</div><div class="opt-label" data-i18n="beds_4">4+ beds</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-step">
+        <div class="filter-step-title" data-i18n="filter_city">Which city or area?</div>
+        <div class="option-grid wide">
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Kyrenia')" data-val="Kyrenia">
+            <div class="opt-icon">⚓</div><div class="opt-label">Kyrenia</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Famagusta')" data-val="Famagusta">
+            <div class="opt-icon">🎓</div><div class="opt-label">Famagusta</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Nicosia')" data-val="Nicosia">
+            <div class="opt-icon">🏛️</div><div class="opt-label">Nicosia</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Iskele')" data-val="Iskele">
+            <div class="opt-icon">🌊</div><div class="opt-label">Iskele</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Lefke')" data-val="Lefke">
+            <div class="opt-icon">🌿</div><div class="opt-label">Lefke</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-step">
+        <div class="filter-step-title" data-i18n="filter_budget">Monthly budget (£)?</div>
+        <div class="budget-row">
+          <input type="number" id="budgetMin" data-i18n-placeholder="budget_min" placeholder="Min £ e.g. 150" min="0">
+          <input type="number" id="budgetMax" data-i18n-placeholder="budget_max" placeholder="Max £ e.g. 800" min="0">
+        </div>
+      </div>
+
+      <div class="filter-step">
+        <div class="filter-step-title" data-i18n="filter_payment">Payment preference?</div>
+        <div class="option-grid wide">
+          <div class="option-btn" onclick="toggleMultiFilter(this,'payment','Monthly')" data-val="Monthly">
+            <div class="opt-icon">📅</div><div class="opt-label" data-i18n="pay_monthly">Monthly</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'payment','3 Months')" data-val="3 Months">
+            <div class="opt-icon">📆</div><div class="opt-label" data-i18n="pay_3">3 Months</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'payment','6 Months')" data-val="6 Months">
+            <div class="opt-icon">🗓️</div><div class="opt-label" data-i18n="pay_6">6 Months</div>
+          </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'payment','1 Year')" data-val="1 Year">
+            <div class="opt-icon">📋</div><div class="opt-label" data-i18n="pay_year">1 Year</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="popup-footer">
+        <button class="btn-popup-clear" onclick="clearFilters()" data-i18n="btn_clear">Clear all</button>
+        <button class="btn-popup-search" onclick="applyFilters()" data-i18n="btn_search">Show me properties →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════
+     LIGHTBOX
+════════════════ -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this)closeLightbox()">
+  <div class="lightbox-main">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close gallery">✕</button>
+    <button class="lightbox-btn prev" id="lbPrev" onclick="lbGo(-1)" aria-label="Previous photo">&#8249;</button>
+    <div class="lightbox-img-wrap" id="lbImgWrap"></div>
+    <button class="lightbox-btn next" id="lbNext" onclick="lbGo(1)" aria-label="Next photo">&#8250;</button>
+  </div>
+  <div class="lightbox-info">
+    <div class="lightbox-title" id="lbTitle"></div>
+    <div class="lightbox-counter" id="lbCounter"></div>
+  </div>
+  <div class="lightbox-thumbs" id="lbThumbs"></div>
+</div>
+
+<!-- ════════════════
+     ADMIN PANEL
+════════════════ -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <h2>Admin Dashboard — N.Cyprus.Rentals</h2>
+      <button class="popup-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-tabs">
+      <div class="admin-tab active" onclick="switchTab('add')">Add Listing</div>
+      <div class="admin-tab" onclick="switchTab('manage')">Manage Listings</div>
+      <div class="admin-tab" onclick="switchTab('requests')">Requests <span id="reqCount" style="background:#1a6fa8;color:white;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:4px;"></span></div>
+    </div>
+    <div class="admin-content" id="adminContent">
+      <div id="tabAdd">
+        <form class="admin-form" onsubmit="addListing(event)">
+          <!-- ID + TITLE -->
+          <div class="admin-row">
+            <div class="admin-group">
+              <label>Listing ID * <span style="font-weight:400;color:var(--muted)">(e.g. KYR001, FAM042)</span></label>
+              <input type="text" id="aListingId" placeholder="e.g. KYR001" required style="font-family:monospace;letter-spacing:0.05em;">
+              <span style="font-size:11px;color:var(--muted);margin-top:3px;">Shown as #KYR001 on the listing card. Must be unique.</span>
+            </div>
+            <div class="admin-group">
+              <label>City *</label>
+              <select id="aCity" required>
+                <option value="">Select city</option>
+                <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
+                <option>Iskele</option><option>Lefke</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <!-- TITLE EN/TR/RU -->
+          <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);margin-bottom:2px;">
+            <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">PROPERTY TITLE</div>
+            <div class="admin-group" style="margin-bottom:10px;">
+              <label>🇬🇧 English title *</label>
+              <input type="text" id="aTitle" placeholder="e.g. 2+1 Flat, Sea View" required>
+            </div>
+            <div class="admin-row">
+              <div class="admin-group">
+                <label>🇹🇷 Turkish title</label>
+                <input type="text" id="aTitleTr" placeholder="e.g. Deniz manzaralı 2+1 daire">
+              </div>
+              <div class="admin-group">
+                <label>🇷🇺 Russian title</label>
+                <input type="text" id="aTitleRu" placeholder="e.g. Квартира 2+1 с видом на море">
+              </div>
+            </div>
+          </div>
+          <!-- TYPE + BEDS -->
+          <div class="admin-row">
+            <div class="admin-group">
+              <label>Property type *</label>
+              <select id="aType" required>
+                <option value="">Select type</option>
+                <option>Villa</option><option>Flat</option><option>Penthouse</option>
+                <option>Studio</option><option>Room</option>
+              </select>
+            </div>
+            <div class="admin-group">
+              <label>Bedrooms *</label>
+              <select id="aBeds" required>
+                <option value="">Select</option>
+                <option value="Studio">Studio</option>
+                <option value="1">1 bedroom</option><option value="2">2 bedrooms</option>
+                <option value="3">3 bedrooms</option><option value="4+">4+ bedrooms</option>
+              </select>
+            </div>
+          </div>
+          <!-- PRICE + PAYMENTS -->
+          <div class="admin-row">
+            <div class="admin-group">
+              <label>Monthly price (£) *</label>
+              <input type="number" id="aPrice" placeholder="e.g. 350" required min="0">
+            </div>
+            <div class="admin-group">
+              <label>Payment options</label>
+              <div class="admin-checkboxes">
+                <label class="check-label"><input type="checkbox" value="Monthly" checked> Monthly</label>
+                <label class="check-label"><input type="checkbox" value="3 Months"> 3 Mo.</label>
+                <label class="check-label"><input type="checkbox" value="6 Months"> 6 Mo.</label>
+                <label class="check-label"><input type="checkbox" value="1 Year"> 1 Year</label>
+              </div>
+            </div>
+          </div>
+          <!-- ADDRESS -->
+          <div class="admin-group">
+            <label>Full address / area</label>
+            <input type="text" id="aAddress" placeholder="e.g. Central Kyrenia, near the harbour">
+          </div>
+          <!-- DESCRIPTION EN/TR/RU -->
+          <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+            <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">DESCRIPTION</div>
+            <div class="admin-group" style="margin-bottom:10px;">
+              <label>🇬🇧 English description *</label>
+              <textarea id="aDesc" placeholder="Describe the property — size, features, nearby places..." required></textarea>
+            </div>
+            <div class="admin-row">
+              <div class="admin-group">
+                <label>🇹🇷 Turkish description</label>
+                <textarea id="aDescTr" placeholder="Mülkü Türkçe açıklayın..."></textarea>
+              </div>
+              <div class="admin-group">
+                <label>🇷🇺 Russian description</label>
+                <textarea id="aDescRu" placeholder="Опишите объект по-русски..."></textarea>
+              </div>
+            </div>
+          </div>
+          <!-- PHOTOS + BADGE -->
+          <div class="admin-row">
+            <div class="admin-group" style="grid-column:1/-1;">
+              <label>Photo URLs — paste up to 10 links, one per line</label>
+              <textarea id="aPhoto" placeholder="https://photo1.com/image.jpg&#10;https://photo2.com/image.jpg&#10;..." style="min-height:80px;font-size:12px;"></textarea>
+              <span style="font-size:11px;color:var(--muted);margin-top:4px;">Each line = one photo. First photo is the cover. Visitors can swipe all photos in the gallery.</span>
+            </div>
+            <div class="admin-group">
+              <label>Badge</label>
+              <select id="aBadge">
+                <option value="">None</option>
+                <option value="new">New</option>
+                <option value="hot">Hot deal</option>
+                <option value="student">Student friendly</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-group">
+            <label>WhatsApp contact number</label>
+            <input type="text" id="aPhone" placeholder="+90 539 118 2520">
+          </div>
+          <button type="submit" class="btn-add">Add listing to website →</button>
+        </form>
+      </div>
+      <div id="tabManage" style="display:none;">
+        <div class="admin-listings-list" id="adminListingsList"></div>
+      </div>
+      <div id="tabRequests" style="display:none;">
+        <div class="admin-requests-list" id="adminRequestsList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════
+     NAVBAR
+════════════════ -->
+<nav class="nav">
+  <a class="nav-logo" href="#" id="navLogo"><span>N.</span>Cyprus.Rentals</a>
+  <div class="nav-links">
+    <a href="#listings" data-i18n="nav_listings">Listings</a>
+    <a href="#request" data-i18n="nav_request">Request a home</a>
+    <a href="#about" data-i18n="nav_about">About Ana</a>
+    <a href="https://wa.me/905391182520" target="_blank" style="color:#25d366;font-weight:500;" data-i18n="nav_whatsapp">WhatsApp</a>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('tr')">TR</button>
+      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+    </div>
+    <a href="#" class="nav-cta" onclick="showFilterPopup();return false;" data-i18n="nav_search">Search now</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')" id="mLangEn">EN</button>
+      <button class="lang-btn" onclick="setLang('tr')" id="mLangTr">TR</button>
+      <button class="lang-btn" onclick="setLang('ru')" id="mLangRu">RU</button>
+    </div>
+    <button class="nav-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="#listings" onclick="closeMobileMenu()" data-i18n="nav_listings">Listings</a>
+    <a href="#request" onclick="closeMobileMenu()" data-i18n="nav_request">Request a home</a>
+    <a href="#about" onclick="closeMobileMenu()" data-i18n="nav_about">About Ana</a>
+    <a href="https://wa.me/905391182520" target="_blank" class="wa-link" onclick="closeMobileMenu()" data-i18n="nav_whatsapp">WhatsApp Ana</a>
+    <a href="#" class="nav-cta" onclick="closeMobileMenu();showFilterPopup();return false;" data-i18n="nav_search">Search now →</a>
+  </div>
+</nav>
+
+<!-- ════════════════
+     HERO
+════════════════ -->
+<section class="hero">
+  <div class="hero-badge" data-i18n="hero_badge">Northern Cyprus · Trusted Agent</div>
+  <h1 data-i18n="hero_h1">Your <em>perfect home</em><br>in Northern Cyprus</h1>
+  <p data-i18n="hero_p">Apartments, studios and villas for students, expats, locals and tourists. Find your ideal place in minutes.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="showFilterPopup()" data-i18n="hero_btn1">Find my home →</button>
+    <a href="#request" class="btn-outline" data-i18n="hero_btn2">Request a property</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="statListings">0</div><div class="stat-label">Active listings</div></div>
+  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Cities covered</div></div>
+  <div class="stat"><div class="stat-num">24h</div><div class="stat-label">Response time</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Trusted agent</div></div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-bar-wrap">
+  <div class="search-quick">
+    <select id="qCity" onchange="quickSearch()">
+      <option value="">All cities</option>
+      <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
+      <option>Iskele</option><option>Lefke</option>
+    </select>
+    <select id="qType" onchange="quickSearch()">
+      <option value="" data-i18n="all_types">All types</option>
+      <option>Villa</option><option>Flat</option><option>Penthouse</option>
+      <option>Studio</option><option>Room</option>
+    </select>
+    <select id="qBudget" onchange="quickSearch()">
+      <option value="">Any budget</option>
+      <option value="300">Up to £300</option>
+      <option value="500">Up to £500</option>
+      <option value="750">Up to £750</option>
+      <option value="1000">Up to £1,000</option>
+      <option value="1500">Up to £1,500</option>
+    </select>
+  </div>
+  <button class="btn-search" onclick="quickSearch()">Search</button>
+  <button class="btn-filter-full" onclick="showFilterPopup()">⚙ Full filter</button>
+</div>
+
+<!-- ════════════════
+     LISTINGS
+════════════════ -->
+<main class="main" id="listings">
+  <div class="section-header">
+    <div class="section-title">Available properties</div>
+    <div class="section-count" id="listingCount"></div>
+  </div>
+  <div id="activeFiltersBar" class="active-filters"></div>
+  <div class="listings-grid" id="listingsGrid">
+    <!-- populated by JS -->
+  </div>
+</main>
+
+<!-- ════════════════
+     REQUEST SECTION
+════════════════ -->
+<div class="main" id="request">
+  <div class="request-section">
+    <div class="request-left">
+      <h2>Can't find what<br>you need? <em>Tell us.</em></h2>
+      <p>Fill in your requirements and Ana will personally find the best options for you and get back within 24 hours — completely free.</p>
+    </div>
+    <div>
+      <form class="request-form" onsubmit="submitRequest(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your name *</label>
+            <input type="text" id="rName" placeholder="Ana / Mohammed / Daria..." required>
+          </div>
+          <div class="form-group">
+            <label>WhatsApp / Phone *</label>
+            <input type="tel" id="rPhone" placeholder="+90 or +44..." required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Property type</label>
+            <select id="rType">
+              <option>Studio</option><option>Apartment</option><option>Villa</option>
+              <option>Room</option><option>Any</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Preferred city</label>
+            <select id="rCity">
+              <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
+              <option>Iskele</option><option>No preference</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Budget (£/month)</label>
+            <input type="text" id="rBudget" placeholder="e.g. £200–£400">
+          </div>
+          <div class="form-group">
+            <label>Move-in date</label>
+            <input type="date" id="rDate">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Any specific requirements?</label>
+          <textarea id="rNotes" placeholder="Furnished, pets allowed, near university, parking, sea view..."></textarea>
+        </div>
+        <button type="submit" class="btn-request">Send my request — Ana will reply fast →</button>
+        <div class="form-success" id="reqSuccess">Your request was sent! Ana will contact you within 24 hours.</div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT ANA -->
+<div class="main" id="about">
+  <div class="about-strip">
+    <div class="about-avatar">A</div>
+    <div class="about-text">
+      <h3>Hi, I'm Ana — your local Cyprus rental expert</h3>
+      <p>I'm a 26-year-old based in Northern Cyprus with deep knowledge of every neighbourhood, price range and rental process. I work independently, so you deal directly with me — no middlemen, no hidden fees, just honest help finding your perfect home.</p>
+    </div>
+    <div class="about-contact">
+      <a class="contact-btn wa-btn" href="https://wa.me/905391182520" target="_blank">
+        <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Ana
+      </a>
+      <a class="contact-btn ig-btn" href="https://instagram.com/N.Cyprus.Rentals" target="_blank">
+        <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        @N.Cyprus.Rentals
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <h4>N.Cyprus.Rentals</h4>
+    <p>Your trusted local rental agent in Northern Cyprus. Finding homes for students, expats, locals & tourists.</p>
+  </div>
+  <div>
+    <h4>Areas</h4>
+    <a href="#">Kyrenia</a>
+    <a href="#">Famagusta</a>
+    <a href="#">Nicosia</a>
+    <a href="#">Iskele</a>
+    <a href="#">Lefke</a>
+  </div>
+  <div>
+    <h4>Contact</h4>
+    <a href="https://wa.me/905391182520">WhatsApp: +90 539 118 2520</a>
+    <a href="mailto:hello@ncyprusrentals.com">hello@ncyprusrentals.com</a>
+    <a href="https://instagram.com/N.Cyprus.Rentals">Instagram: @N.Cyprus.Rentals</a>
+  </div>
+  <div class="footer-bottom">© 2025 N.Cyprus.Rentals · Made with care by Ana · Northern Cyprus</div>
+</footer>
+
+<!-- Admin access: secret double-click on logo -->
+<script>
+/* ══════════════════════════════════════════
+   DATA LAYER — localStorage as mini backend
+══════════════════════════════════════════ */
+function getListings() {
+  try { return JSON.parse(localStorage.getItem('ncr_listings') || '[]'); } catch(e) { return []; }
+}
+function saveListings(arr) { localStorage.setItem('ncr_listings', JSON.stringify(arr)); }
+function getRequests() {
+  try { return JSON.parse(localStorage.getItem('ncr_requests') || '[]'); } catch(e) { return []; }
+}
+function saveRequests(arr) { localStorage.setItem('ncr_requests', JSON.stringify(arr)); }
+
+/* Seed demo listings on first visit */
+function seedDemo() {
+  if (localStorage.getItem('ncr_seeded')) return;
+  const demos = [
+    { id: 1, title: "1+1 Flat, Harbour View", city: "Kyrenia", type: "Flat", beds: "1", price: 380, address: "Central Kyrenia, near the harbour", desc: "Bright furnished flat with balcony and sea views. Walking distance to restaurants and shops. Bills negotiable.", photo: "", photos: [], badge: "new", payments: ["Monthly","3 Months","6 Months"], phone: "+905391182520", active: true },
+    { id: 2, title: "Studio Near EMU Campus", city: "Famagusta", type: "Studio", beds: "Studio", price: 180, address: "5 min walk from Eastern Mediterranean University", desc: "Compact studio perfect for students. Furnished, WiFi included, secure building with 24h security.", photo: "", photos: [], badge: "student", payments: ["Monthly","3 Months"], phone: "+905391182520", active: true },
+    { id: 3, title: "3+1 Private Villa, Sea View", city: "Iskele", type: "Villa", beds: "3", price: 950, address: "Iskele Long Beach area, gated complex", desc: "Stunning 3-bedroom villa with private garden, pool access and breathtaking sea views. Perfect for families.", photo: "", photos: [], badge: "hot", payments: ["Monthly","3 Months","6 Months","1 Year"], phone: "+905391182520", active: true },
+    { id: 4, title: "2+1 Modern Flat", city: "Nicosia", type: "Flat", beds: "2", price: 450, address: "Near the city centre, Nicosia North", desc: "Spacious modern flat with new furniture, air conditioning in all rooms and covered parking.", photo: "", photos: [], badge: "", payments: ["Monthly","6 Months","1 Year"], phone: "+905391182520", active: true },
+    { id: 5, title: "Cosy Room in Shared House", city: "Famagusta", type: "Room", beds: "1", price: 120, address: "Near Necat British College, Famagusta", desc: "Private room in a friendly shared house. 3 housemates, shared kitchen and living room. All bills included.", photo: "", photos: [], badge: "student", payments: ["Monthly"], phone: "+905391182520", active: true },
+    { id: 6, title: "Luxury Penthouse, Old Town", city: "Kyrenia", type: "Penthouse", beds: "2", price: 1200, address: "Kyrenia Old Harbour, historic district", desc: "Exclusive penthouse with wraparound terrace, premium furnishing and panoramic harbour and mountain views.", photo: "", photos: [], badge: "hot", payments: ["Monthly","3 Months","6 Months","1 Year"], phone: "+905391182520", active: true },
+  ];
+  saveListings(demos);
+  localStorage.setItem('ncr_seeded', '1');
+}
+
+/* ══════════════════════════════════════
+   i18n — THREE LANGUAGE SYSTEM
+══════════════════════════════════════ */
+const translations = {
+  en: {
+    nav_listings: 'Listings', nav_request: 'Request a home', nav_about: 'About Ana',
+    nav_whatsapp: 'WhatsApp', nav_search: 'Search now',
+    hero_badge: 'Northern Cyprus · Trusted Agent',
+    hero_h1: 'Your <em>perfect home</em><br>in Northern Cyprus',
+    hero_p: 'Apartments, studios and villas for students, expats, locals and tourists. Find your ideal place in minutes.',
+    hero_btn1: 'Find my home →', hero_btn2: 'Request a property',
+    popup_title: 'Find your perfect home',
+    popup_sub: 'Select as many options as you like — we\'ll show all matching properties',
+    filter_type: 'What type of property?', filter_beds: 'How many bedrooms?',
+    filter_city: 'Which city or area?', filter_budget: 'Monthly budget (£)?',
+    filter_payment: 'Payment preference?',
+    type_villa: 'Villa', type_flat: 'Flat', type_penthouse: 'Penthouse', type_studio: 'Studio', type_room: 'Room',
+    beds_studio: 'Studio', beds_1: '1 bed', beds_2: '2 beds', beds_3: '3 beds', beds_4: '4+ beds',
+    pay_monthly: 'Monthly', pay_3: '3 Months', pay_6: '6 Months', pay_year: '1 Year',
+    btn_clear: 'Clear all', btn_search: 'Show me properties →',
+    budget_min: 'Min £ e.g. 150', budget_max: 'Max £ e.g. 800',
+    all_types: 'All types', all_cities: 'All cities', any_budget: 'Any budget',
+    props_found: 'properties found', available_props: 'Available properties',
+    enquire: 'Enquire →', per_month: '/month',
+    empty_title: 'No properties match your search',
+    empty_p: "Don't worry — Ana can find it for you personally.\nFill in the request form below and she'll get back to you fast.",
+    empty_btn: 'Request my property →',
+    req_title: "Can't find what\nyou need?", req_em: 'Tell us.',
+    req_p: 'Fill in your requirements and Ana will personally find the best options for you and get back within 24 hours — completely free.',
+    about_title: "Hi, I'm Ana — your local Cyprus rental expert",
+    about_p: "I'm a 26-year-old based in Northern Cyprus with deep knowledge of every neighbourhood, price range and rental process. I work independently, so you deal directly with me — no middlemen, no hidden fees, just honest help finding your perfect home.",
+    footer_desc: 'Your trusted local rental agent in Northern Cyprus. Finding homes for students, expats, locals & tourists.',
+    footer_areas: 'Areas', footer_contact: 'Contact',
+    stat_listings: 'Active listings', stat_cities: 'Cities covered', stat_response: 'Response time', stat_trust: 'Trusted agent',
+  },
+  tr: {
+    nav_listings: 'İlanlar', nav_request: 'Ev talep et', nav_about: 'Ana Hakkında',
+    nav_whatsapp: 'WhatsApp', nav_search: 'Şimdi ara',
+    hero_badge: 'Kuzey Kıbrıs · Güvenilir Acente',
+    hero_h1: 'Kuzey Kıbrıs\'ta <em>mükemmel eviniz</em>',
+    hero_p: 'Öğrenciler, expat\'lar, yerliler ve turistler için daireler, stüdyolar ve villalar. Dakikalar içinde ideal yerinizi bulun.',
+    hero_btn1: 'Evimi bul →', hero_btn2: 'Mülk talep et',
+    popup_title: 'Mükemmel evinizi bulun',
+    popup_sub: 'İstediğiniz kadar seçenek seçin — tüm uygun mülkleri göstereceğiz',
+    filter_type: 'Ne tür bir mülk?', filter_beds: 'Kaç yatak odası?',
+    filter_city: 'Hangi şehir veya bölge?', filter_budget: 'Aylık bütçe (£)?',
+    filter_payment: 'Ödeme tercihi?',
+    type_villa: 'Villa', type_flat: 'Daire', type_penthouse: 'Penthouse', type_studio: 'Stüdyo', type_room: 'Oda',
+    beds_studio: 'Stüdyo', beds_1: '1 yatak', beds_2: '2 yatak', beds_3: '3 yatak', beds_4: '4+ yatak',
+    pay_monthly: 'Aylık', pay_3: '3 Ay', pay_6: '6 Ay', pay_year: '1 Yıl',
+    btn_clear: 'Temizle', btn_search: 'Mülkleri göster →',
+    budget_min: 'Min £ ör. 150', budget_max: 'Maks £ ör. 800',
+    all_types: 'Tüm tipler', all_cities: 'Tüm şehirler', any_budget: 'Herhangi bütçe',
+    props_found: 'mülk bulundu', available_props: 'Mevcut mülkler',
+    enquire: 'Bilgi al →', per_month: '/ay',
+    empty_title: 'Aramanızla eşleşen mülk yok',
+    empty_p: "Endişelenmeyin — Ana sizin için kişisel olarak bulabilir.\nAşağıdaki talep formunu doldurun, hızlıca geri dönsün.",
+    empty_btn: 'Mülkümü talep et →',
+    req_title: "İstediğinizi\nbulamıyor musunuz?", req_em: 'Bize söyleyin.',
+    req_p: 'Gereksinimlerinizi doldurun, Ana 24 saat içinde size en iyi seçenekleri bulup ücretsiz geri dönsün.',
+    about_title: "Merhaba, ben Ana — yerel Kıbrıs kiralama uzmanınızım",
+    about_p: "Kuzey Kıbrıs\'ta yaşayan 26 yaşında bir genç kızım. Her mahalle, fiyat aralığı ve kiralama sürecini iyi bilirim. Bağımsız çalışıyorum — doğrudan benimle iletişim kurarsınız, aracı yok, gizli ücret yok.",
+    footer_desc: 'Kuzey Kıbrıs\'ta güvenilir yerel kiralama acenteniz. Öğrenciler, expat\'lar, yerliler ve turistler için ev buluyoruz.',
+    footer_areas: 'Bölgeler', footer_contact: 'İletişim',
+    stat_listings: 'Aktif ilan', stat_cities: 'Kapsanan şehir', stat_response: 'Yanıt süresi', stat_trust: 'Güvenilir acente',
+  },
+  ru: {
+    nav_listings: 'Объявления', nav_request: 'Запросить жильё', nav_about: 'Об Ане',
+    nav_whatsapp: 'WhatsApp', nav_search: 'Найти сейчас',
+    hero_badge: 'Северный Кипр · Надёжный агент',
+    hero_h1: 'Ваш <em>идеальный дом</em><br>на Северном Кипре',
+    hero_p: 'Квартиры, студии и виллы для студентов, экспатов, местных и туристов. Найдите идеальное жильё за минуты.',
+    hero_btn1: 'Найти жильё →', hero_btn2: 'Запросить объект',
+    popup_title: 'Найдите идеальное жильё',
+    popup_sub: 'Выбирайте несколько вариантов — покажем все подходящие объекты',
+    filter_type: 'Тип недвижимости?', filter_beds: 'Количество спален?',
+    filter_city: 'Город или район?', filter_budget: 'Ежемесячный бюджет (£)?',
+    filter_payment: 'Вариант оплаты?',
+    type_villa: 'Вилла', type_flat: 'Квартира', type_penthouse: 'Пентхаус', type_studio: 'Студия', type_room: 'Комната',
+    beds_studio: 'Студия', beds_1: '1 спальня', beds_2: '2 спальни', beds_3: '3 спальни', beds_4: '4+ спален',
+    pay_monthly: 'Ежемесячно', pay_3: '3 месяца', pay_6: '6 месяцев', pay_year: '1 год',
+    btn_clear: 'Сбросить', btn_search: 'Показать объекты →',
+    budget_min: 'Мин £ напр. 150', budget_max: 'Макс £ напр. 800',
+    all_types: 'Все типы', all_cities: 'Все города', any_budget: 'Любой бюджет',
+    props_found: 'объектов найдено', available_props: 'Доступные объекты',
+    enquire: 'Узнать →', per_month: '/мес',
+    empty_title: 'Объектов по вашему запросу не найдено',
+    empty_p: "Не переживайте — Ана лично найдёт для вас лучший вариант.\nЗаполните форму запроса ниже — она свяжется быстро.",
+    empty_btn: 'Запросить жильё →',
+    req_title: "Не нашли\nнужное?", req_em: 'Напишите нам.',
+    req_p: 'Заполните ваши требования, и Ана лично подберёт лучшие варианты и вернётся в течение 24 часов — совершенно бесплатно.',
+    about_title: "Привет, я Ана — ваш местный эксперт по аренде на Кипре",
+    about_p: "Мне 26 лет, я живу на Северном Кипре и знаю каждый район, ценовой диапазон и процесс аренды. Работаю самостоятельно — общаетесь напрямую со мной, без посредников и скрытых комиссий.",
+    footer_desc: 'Надёжный местный агент по аренде на Северном Кипре. Находим жильё для студентов, экспатов, местных и туристов.',
+    footer_areas: 'Районы', footer_contact: 'Контакты',
+    stat_listings: 'Активных объявлений', stat_cities: 'Городов', stat_response: 'Время ответа', stat_trust: 'Надёжный агент',
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = translations[lang];
+  // update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  // update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key] !== undefined) el.placeholder = t[key];
+  });
+  // update lang buttons — all sets
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+  });
+  // re-render listings with new language strings
+  renderListings(window._lastFilters || {});
+  // update stats labels
+  const statLabels = document.querySelectorAll('.stat-label');
+  const keys = ['stat_listings','stat_cities','stat_response','stat_trust'];
+  statLabels.forEach((el,i) => { if(keys[i] && t[keys[i]]) el.textContent = t[keys[i]]; });
+  // quick search placeholders
+  const qCity = document.getElementById('qCity');
+  const qType = document.getElementById('qType');
+  const qBudget = document.getElementById('qBudget');
+  if(qCity) qCity.options[0].text = t.all_cities || 'All cities';
+  if(qType) qType.options[0].text = t.all_types || 'All types';
+  if(qBudget) qBudget.options[0].text = t.any_budget || 'Any budget';
+}
+
+function T(key) { return translations[currentLang][key] || translations.en[key] || key; }
+
+/* ══════════════════════════════════════
+   MULTI-SELECT FILTERS
+══════════════════════════════════════ */
+const popupFilters = { type: [], beds: [], city: [], payment: [] };
+
+function toggleMultiFilter(el, key, val) {
+  const arr = popupFilters[key];
+  const idx = arr.indexOf(val);
+  if (idx === -1) {
+    arr.push(val);
+    el.classList.add('active');
+  } else {
+    arr.splice(idx, 1);
+    el.classList.remove('active');
+  }
+}
+
+function clearFilters() {
+  Object.keys(popupFilters).forEach(k => { popupFilters[k] = []; });
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('budgetMin').value = '';
+  document.getElementById('budgetMax').value = '';
+}
+
+function applyFilters() {
+  const min = parseFloat(document.getElementById('budgetMin').value) || 0;
+  const max = parseFloat(document.getElementById('budgetMax').value) || Infinity;
+  const criteria = {
+    types: [...popupFilters.type],
+    beds: [...popupFilters.beds],
+    cities: [...popupFilters.city],
+    payments: [...popupFilters.payment],
+    budgetMin: min, budgetMax: max
+  };
+  window._lastFilters = criteria;
+  closePopup();
+  renderListings(criteria);
+  renderActiveFilters(criteria);
+  document.getElementById('listings').scrollIntoView({ behavior: 'smooth' });
+}
+
+function quickSearch() {
+  const city = document.getElementById('qCity').value;
+  const type = document.getElementById('qType').value;
+  const budgetMax = parseFloat(document.getElementById('qBudget').value) || Infinity;
+  const criteria = {
+    cities: city ? [city] : [],
+    types: type ? [type] : [],
+    budgetMax
+  };
+  window._lastFilters = criteria;
+  renderListings(criteria);
+  renderActiveFilters(criteria);
+}
+
+function renderActiveFilters(c) {
+  const bar = document.getElementById('activeFiltersBar');
+  bar.innerHTML = '';
+  const add = (label) => {
+    const chip = document.createElement('div');
+    chip.className = 'filter-chip';
+    chip.innerHTML = `${label} <span class="filter-chip-remove" onclick="clearAllFilters()">✕</span>`;
+    bar.appendChild(chip);
+  };
+  if (c.types && c.types.length) add(T('filter_type').replace('?','') + ': ' + c.types.join(', '));
+  if (c.beds && c.beds.length) add(T('filter_beds').replace('?','') + ': ' + c.beds.join(', '));
+  if (c.cities && c.cities.length) add(T('filter_city').replace('?','') + ': ' + c.cities.join(', '));
+  if (c.payments && c.payments.length) add(T('filter_payment').replace('?','') + ': ' + c.payments.join(', '));
+  if (c.budgetMax && c.budgetMax !== Infinity) add('Max: £' + c.budgetMax);
+  if (c.budgetMin && c.budgetMin > 0) add('Min: £' + c.budgetMin);
+}
+
+function clearAllFilters() {
+  clearFilters();
+  window._lastFilters = {};
+  document.getElementById('qCity').value = '';
+  document.getElementById('qType').value = '';
+  document.getElementById('qBudget').value = '';
+  renderListings({});
+  renderActiveFilters({});
+}
+
+function removeFilter(key) { clearAllFilters(); }
+
+
+/* ══════════════════
+   RENDER LISTINGS
+══════════════════ */
+function renderListings(filters = {}) {
+  const grid = document.getElementById('listingsGrid');
+  const countEl = document.getElementById('listingCount');
+  let listings = getListings().filter(l => l.active);
+
+  if (filters.types && filters.types.length) listings = listings.filter(l => filters.types.includes(l.type));
+  if (filters.beds && filters.beds.length) listings = listings.filter(l => filters.beds.includes(l.beds));
+  if (filters.cities && filters.cities.length) listings = listings.filter(l => filters.cities.includes(l.city));
+  if (filters.payments && filters.payments.length) listings = listings.filter(l => l.payments && filters.payments.some(p => l.payments.includes(p)));
+  if (filters.type && !filters.types) listings = listings.filter(l => l.type === filters.type);
+  if (filters.city && !filters.cities) listings = listings.filter(l => l.city === filters.city);
+  if (filters.budgetMin) listings = listings.filter(l => l.price >= filters.budgetMin);
+  if (filters.budgetMax && filters.budgetMax !== Infinity) listings = listings.filter(l => l.price <= filters.budgetMax);
+
+  document.getElementById('statListings').textContent = getListings().filter(l => l.active).length;
+  countEl.textContent = listings.length + ' ' + T('props_found');
+
+  const sectionTitle = document.querySelector('.section-title');
+  if (sectionTitle) sectionTitle.textContent = T('available_props');
+
+  if (listings.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <h3>${T('empty_title')}</h3>
+        <p>${T('empty_p').replace('\n','<br>')}</p>
+        <a href="#request" class="btn-primary" style="display:inline-block;">${T('empty_btn')}</a>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = listings.map(l => {
+    const badgeMap = { new: 'badge-new', hot: 'badge-hot', student: 'badge-student' };
+    const badgeLabel = { new: 'New', hot: 'Hot deal', student: 'Student friendly' };
+    const photos = l.photos && l.photos.length ? l.photos : (l.photo ? [l.photo] : []);
+    const coverPhoto = photos[0] || '';
+    const photoHtml = coverPhoto
+      ? `<img src="${coverPhoto}" alt="${l.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`
+      : `<div class="listing-photo-placeholder">
+           <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="#1a6fa8" opacity="0.35"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline stroke-linecap="round" stroke-linejoin="round" stroke-width="1" points="9 22 9 12 15 12 15 22"/></svg>
+           <span style="font-size:12px;color:#5aacdb;">${l.type} · ${l.city}</span>
+         </div>`;
+    const payKeyMap = { Monthly:'pay_monthly', '3 Months':'pay_3', '6 Months':'pay_6', '1 Year':'pay_year' };
+    const payTags = (l.payments || []).map(p => `<span class="tag">${T(payKeyMap[p]) || p}</span>`).join('');
+    const typeTagMap = { Villa:'type_villa', Flat:'type_flat', Penthouse:'type_penthouse', Studio:'type_studio', Room:'type_room' };
+    const typeTag = T(typeTagMap[l.type]) || l.type;
+    const bedsTagMap = { Studio:'beds_studio', '1':'beds_1', '2':'beds_2', '3':'beds_3', '4+':'beds_4' };
+    const bedsTag = T(bedsTagMap[l.beds]) || l.beds;
+    const waLink = l.phone ? `https://wa.me/${l.phone.replace(/\D/g,'')}?text=Hi Ana! I'm interested in: ${encodeURIComponent(l.title)}` : '#';
+    const photoCountBadge = '';
+    const clickAttr = photos.length ? `onclick="openLightbox(${l.id})" style="cursor:pointer;"` : '';
+    const listingId = l.listingId ? `<span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px;">#${l.listingId}</span>` : '';
+    return `
+      <div class="listing-card">
+        <div class="listing-photo" ${clickAttr}>
+          ${photoHtml}
+          ${l.badge ? `<span class="listing-badge ${badgeMap[l.badge]}">${badgeLabel[l.badge]}</span>` : ''}
+          <span class="listing-price-tag">£${l.price}/mo</span>
+        </div>
+        <div class="listing-body">
+          <div class="listing-title">${getTrans(l,'title')}${listingId}</div>
+          <div class="listing-location">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            ${l.city}${l.address ? ' · ' + l.address : ''}
+          </div>
+          <div class="listing-tags">
+            <span class="tag">${typeTag}</span>
+            <span class="tag">${bedsTag}</span>
+            ${payTags}
+          </div>
+          ${l.desc ? `<p style="font-size:13px;color:#6b8799;line-height:1.5;margin-bottom:12px;">${getTrans(l,'desc').substring(0,90)}${getTrans(l,'desc').length > 90 ? '…' : ''}</p>` : ''}
+          <div class="listing-footer">
+            <div class="listing-footer-price">£${l.price}<span>${T('per_month')}</span></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              ${photos.length > 1 ? `<button onclick="openLightbox(${l.id})" style="background:var(--mist);color:var(--ocean);border:1px solid var(--border);padding:7px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> ${photos.length} photos</button>` : ''}
+              <a class="btn-enquire" href="${waLink}" target="_blank">${T('enquire')}</a>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ══════════════
+   POPUP CONTROL
+══════════════ */
+function showFilterPopup() {
+  document.getElementById('welcomeOverlay').style.display = 'flex';
+}
+function closePopup() {
+  document.getElementById('welcomeOverlay').style.display = 'none';
+}
+document.getElementById('welcomeOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePopup();
+});
+
+/* ══════════════
+   REQUEST FORM
+══════════════ */
+function submitRequest(e) {
+  e.preventDefault();
+  const req = {
+    id: Date.now(),
+    name: document.getElementById('rName').value,
+    phone: document.getElementById('rPhone').value,
+    type: document.getElementById('rType').value,
+    city: document.getElementById('rCity').value,
+    budget: document.getElementById('rBudget').value,
+    date: document.getElementById('rDate').value,
+    notes: document.getElementById('rNotes').value,
+    submitted: new Date().toLocaleString(),
+    status: 'new'
+  };
+  const reqs = getRequests();
+  reqs.unshift(req);
+  saveRequests(reqs);
+  document.getElementById('reqSuccess').style.display = 'block';
+  e.target.querySelectorAll('input,select,textarea').forEach(el => el.value = '');
+  setTimeout(() => document.getElementById('reqSuccess').style.display = 'none', 5000);
+  showNotif('Request received! Ana will contact you soon.');
+}
+
+/* ══════════════════
+   HAMBURGER MENU
+══════════════════ */
+function toggleMobileMenu() {
+  const btn = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('mobileMenu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  const btn = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('mobileMenu');
+  if (!btn.contains(e.target) && !menu.contains(e.target)) {
+    btn.classList.remove('open');
+    menu.classList.remove('open');
+  }
+});
+
+/* ══════════════════
+   LIGHTBOX GALLERY
+══════════════════ */
+let lbListingId = null;
+let lbPhotos = [];
+let lbIndex = 0;
+
+function openLightbox(listingId) {
+  const listing = getListings().find(l => l.id === listingId);
+  if (!listing) return;
+  lbListingId = listingId;
+  lbPhotos = listing.photos && listing.photos.length ? listing.photos : (listing.photo ? [listing.photo] : []);
+  if (!lbPhotos.length) return;
+  lbIndex = 0;
+  renderLightbox(listing);
+  document.getElementById('lightboxOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lbGo(dir) {
+  lbIndex = (lbIndex + dir + lbPhotos.length) % lbPhotos.length;
+  updateLightboxImage();
+}
+
+function lbGoTo(idx) {
+  lbIndex = idx;
+  updateLightboxImage();
+}
+
+function renderLightbox(listing) {
+  const title = document.getElementById('lbTitle');
+  const counter = document.getElementById('lbCounter');
+  const thumbs = document.getElementById('lbThumbs');
+  const prevBtn = document.getElementById('lbPrev');
+  const nextBtn = document.getElementById('lbNext');
+
+  title.textContent = listing.title + ' — ' + listing.city;
+  prevBtn.style.display = lbPhotos.length > 1 ? 'flex' : 'none';
+  nextBtn.style.display = lbPhotos.length > 1 ? 'flex' : 'none';
+
+  thumbs.innerHTML = lbPhotos.map((ph, i) =>
+    `<div class="lightbox-thumb ${i === 0 ? 'active' : ''}" onclick="lbGoTo(${i})" id="lbThumb${i}">
+      ${ph ? `<img src="${ph}" alt="Photo ${i+1}" loading="lazy">` : `<div class="lightbox-thumb-placeholder">Photo ${i+1}</div>`}
+    </div>`
+  ).join('');
+
+  updateLightboxImage();
+}
+
+function updateLightboxImage() {
+  const imgWrap = document.getElementById('lbImgWrap');
+  const counter = document.getElementById('lbCounter');
+  const ph = lbPhotos[lbIndex];
+
+  if (ph) {
+    imgWrap.innerHTML = `<img src="${ph}" alt="Photo ${lbIndex+1}">`;
+  } else {
+    imgWrap.innerHTML = `<div class="lightbox-img-placeholder"><svg width="56" height="56" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>No photo</span></div>`;
+  }
+  counter.textContent = `${lbIndex + 1} / ${lbPhotos.length}`;
+  document.querySelectorAll('.lightbox-thumb').forEach((t, i) => {
+    t.classList.toggle('active', i === lbIndex);
+  });
+}
+
+document.addEventListener('keydown', function(e) {
+  if (!document.getElementById('lightboxOverlay').classList.contains('open')) return;
+  if (e.key === 'ArrowRight') lbGo(1);
+  if (e.key === 'ArrowLeft') lbGo(-1);
+  if (e.key === 'Escape') closeLightbox();
+});
+
+/* ══════════════════
+   ADMIN LOGO CLICKS
+══════════════════ */
+let adminClicks = 0;
+document.getElementById('navLogo').addEventListener('click', function(e) {
+  adminClicks++;
+  if (adminClicks >= 3) {
+    adminClicks = 0;
+    const pwd = prompt('Admin password:');
+    if (pwd === 'ncr2025') openAdmin();
+  }
+  setTimeout(() => { adminClicks = 0; }, 2000);
+});
+
+
+
+function openAdmin() {
+  document.getElementById('adminOverlay').style.display = 'flex';
+  renderAdminListings();
+  renderAdminRequests();
+  const reqs = getRequests().filter(r => r.status === 'new');
+  document.getElementById('reqCount').textContent = reqs.length || '';
+}
+function closeAdmin() {
+  document.getElementById('adminOverlay').style.display = 'none';
+  renderListings();
+}
+function switchTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#tabAdd,#tabManage,#tabRequests').forEach(t => t.style.display = 'none');
+  event.target.classList.add('active');
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+  if (tab === 'manage') renderAdminListings();
+  if (tab === 'requests') renderAdminRequests();
+}
+
+/* helper: get translated field for current lang */
+function getTrans(listing, field) {
+  if (currentLang === 'tr' && listing[field + '_tr']) return listing[field + '_tr'];
+  if (currentLang === 'ru' && listing[field + '_ru']) return listing[field + '_ru'];
+  return listing[field] || '';
+}
+
+function addListing(e) {
+  e.preventDefault();
+  const payments = Array.from(document.querySelectorAll('#tabAdd input[type=checkbox]:checked')).map(c => c.value);
+  const photoRaw = document.getElementById('aPhoto').value;
+  const photos = photoRaw.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+  const rawId = document.getElementById('aListingId').value.trim().toUpperCase().replace(/\s+/g,'');
+  // check for duplicate ID
+  const existing = getListings().find(l => l.listingId === rawId);
+  if (existing) { alert('This Listing ID already exists: ' + rawId + '. Please use a unique ID.'); return; }
+  const listing = {
+    id: Date.now(),
+    listingId: rawId,
+    title: document.getElementById('aTitle').value,
+    title_tr: document.getElementById('aTitleTr').value,
+    title_ru: document.getElementById('aTitleRu').value,
+    city: document.getElementById('aCity').value,
+    type: document.getElementById('aType').value,
+    beds: document.getElementById('aBeds').value,
+    price: parseFloat(document.getElementById('aPrice').value),
+    address: document.getElementById('aAddress').value,
+    desc: document.getElementById('aDesc').value,
+    desc_tr: document.getElementById('aDescTr').value,
+    desc_ru: document.getElementById('aDescRu').value,
+    photo: photos[0] || '',
+    photos: photos,
+    badge: document.getElementById('aBadge').value,
+    payments,
+    phone: document.getElementById('aPhone').value || '+905391182520',
+    active: true
+  };
+  const listings = getListings();
+  listings.unshift(listing);
+  saveListings(listings);
+  e.target.reset();
+  showNotif('Listing #' + rawId + ' added! It is now live on the website.');
+  renderListings();
+  document.getElementById('statListings').textContent = getListings().filter(l => l.active).length;
+}
+
+function renderAdminListings() {
+  const list = document.getElementById('adminListingsList');
+  const listings = getListings();
+  if (!listings.length) { list.innerHTML = '<p style="color:var(--muted);font-size:14px;">No listings yet. Add your first one!</p>'; return; }
+  list.innerHTML = listings.map(l => `
+    <div class="admin-listing-item">
+      <div class="ali-info">
+        <h4>${l.listingId ? `<span style="font-family:monospace;background:var(--mist);color:var(--ocean);padding:2px 8px;border-radius:5px;font-size:11px;margin-right:6px;">#${l.listingId}</span>` : ''}${l.title} ${!l.active ? '<span style="font-size:10px;background:#eee;color:#888;padding:2px 7px;border-radius:8px;">Hidden</span>' : ''}</h4>
+        <p>${l.city} · ${l.type} · £${l.price}/mo · ${l.beds} bed${l.title_tr ? ' · 🇹🇷' : ''}${l.title_ru ? ' · 🇷🇺' : ''}</p>
+      </div>
+      <div class="ali-actions">
+        <button class="btn-edit" onclick="openEditModal(${l.id})">Edit</button>
+        <button class="btn-toggle" onclick="toggleListing(${l.id})">${l.active ? 'Hide' : 'Show'}</button>
+        <button class="btn-del" onclick="deleteListing(${l.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════
+   EDIT MODAL
+══════════════════════════ */
+function openEditModal(id) {
+  const l = getListings().find(x => x.id === id);
+  if (!l) return;
+  // Remove existing modal if any
+  const old = document.getElementById('editModalOverlay');
+  if (old) old.remove();
+
+  const payOpts = ['Monthly','3 Months','6 Months','1 Year'];
+  const payChecks = payOpts.map(p =>
+    `<label class="check-label"><input type="checkbox" value="${p}" ${(l.payments||[]).includes(p)?'checked':''}> ${p}</label>`
+  ).join('');
+
+  const modal = document.createElement('div');
+  modal.id = 'editModalOverlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;max-width:680px;width:100%;margin:20px auto;overflow:hidden;">
+      <div style="background:var(--navy);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#fff;">Edit Listing ${l.listingId ? '— #'+l.listingId : ''}</h2>
+        <button onclick="closeEditModal()" style="background:rgba(255,255,255,0.12);border:none;color:white;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div style="padding:24px;display:flex;flex-direction:column;gap:14px;">
+
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">LISTING ID & CITY</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="admin-group">
+              <label>Listing ID</label>
+              <input id="eListingId" value="${l.listingId||''}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:monospace;width:100%;outline:none;">
+            </div>
+            <div class="admin-group">
+              <label>City</label>
+              <select id="eCity" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+                ${['Kyrenia','Famagusta','Nicosia','Iskele','Lefke','Other'].map(c=>`<option ${l.city===c?'selected':''}>${c}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">PROPERTY TITLE</div>
+          <div class="admin-group" style="margin-bottom:10px;">
+            <label>🇬🇧 English title</label>
+            <input id="eTitle" value="${(l.title||'').replace(/"/g,'&quot;')}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="admin-group">
+              <label>🇹🇷 Turkish title</label>
+              <input id="eTitleTr" value="${(l.title_tr||'').replace(/"/g,'&quot;')}" placeholder="Turkish..." style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+            </div>
+            <div class="admin-group">
+              <label>🇷🇺 Russian title</label>
+              <input id="eTitleRu" value="${(l.title_ru||'').replace(/"/g,'&quot;')}" placeholder="Russian..." style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="admin-group">
+            <label>Type</label>
+            <select id="eType" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+              ${['Villa','Flat','Penthouse','Studio','Room'].map(t=>`<option ${l.type===t?'selected':''}>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="admin-group">
+            <label>Bedrooms</label>
+            <select id="eBeds" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+              ${[{v:'Studio',l:'Studio'},{v:'1',l:'1 bed'},{v:'2',l:'2 beds'},{v:'3',l:'3 beds'},{v:'4+',l:'4+ beds'}].map(o=>`<option value="${o.v}" ${l.beds===o.v?'selected':''}>${o.l}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="admin-group">
+            <label>Monthly price (£)</label>
+            <input id="ePrice" type="number" value="${l.price}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+          </div>
+          <div class="admin-group">
+            <label>Payment options</label>
+            <div class="admin-checkboxes" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;">${payChecks}</div>
+          </div>
+        </div>
+
+        <div class="admin-group">
+          <label>Address / area</label>
+          <input id="eAddress" value="${(l.address||'').replace(/"/g,'&quot;')}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+        </div>
+
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;">DESCRIPTION</div>
+          <div class="admin-group" style="margin-bottom:10px;">
+            <label>🇬🇧 English</label>
+            <textarea id="eDesc" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:70px;resize:vertical;font-family:'DM Sans',sans-serif;">${l.desc||''}</textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="admin-group">
+              <label>🇹🇷 Turkish</label>
+              <textarea id="eDescTr" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;">${l.desc_tr||''}</textarea>
+            </div>
+            <div class="admin-group">
+              <label>🇷🇺 Russian</label>
+              <textarea id="eDescRu" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;">${l.desc_ru||''}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-group">
+          <label>Photo URLs — one per line</label>
+          <textarea id="ePhotos" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;width:100%;outline:none;min-height:80px;resize:vertical;font-family:monospace;">${(l.photos&&l.photos.length?l.photos:l.photo?[l.photo]:[]).join('\n')}</textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="admin-group">
+            <label>Badge</label>
+            <select id="eBadge" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+              <option value="" ${!l.badge?'selected':''}>None</option>
+              <option value="new" ${l.badge==='new'?'selected':''}>New</option>
+              <option value="hot" ${l.badge==='hot'?'selected':''}>Hot deal</option>
+              <option value="student" ${l.badge==='student'?'selected':''}>Student friendly</option>
+            </select>
+          </div>
+          <div class="admin-group">
+            <label>WhatsApp number</label>
+            <input id="ePhone" value="${l.phone||''}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
+          </div>
+        </div>
+
+        <button onclick="saveEdit(${l.id})" style="background:var(--ocean);color:white;border:none;padding:13px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;" onmouseover="this.style.background='var(--navy)'" onmouseout="this.style.background='var(--ocean)'">Save changes →</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeEditModal(); });
+}
+
+function closeEditModal() {
+  const m = document.getElementById('editModalOverlay');
+  if (m) m.remove();
+}
+
+function saveEdit(id) {
+  const payments = Array.from(document.querySelectorAll('#editModalOverlay input[type=checkbox]:checked')).map(c => c.value);
+  const photoRaw = document.getElementById('ePhotos').value;
+  const photos = photoRaw.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+  const newId = document.getElementById('eListingId').value.trim().toUpperCase().replace(/\s+/g,'');
+  // check for duplicate ID (excluding self)
+  const duplicate = getListings().find(l => l.listingId === newId && l.id !== id);
+  if (duplicate) { alert('This Listing ID already exists: ' + newId + '. Please use a unique ID.'); return; }
+  const listings = getListings().map(l => {
+    if (l.id !== id) return l;
+    return {
+      ...l,
+      listingId: newId || l.listingId,
+      title: document.getElementById('eTitle').value,
+      title_tr: document.getElementById('eTitleTr').value,
+      title_ru: document.getElementById('eTitleRu').value,
+      city: document.getElementById('eCity').value,
+      type: document.getElementById('eType').value,
+      beds: document.getElementById('eBeds').value,
+      price: parseFloat(document.getElementById('ePrice').value) || l.price,
+      address: document.getElementById('eAddress').value,
+      desc: document.getElementById('eDesc').value,
+      desc_tr: document.getElementById('eDescTr').value,
+      desc_ru: document.getElementById('eDescRu').value,
+      photo: photos[0] || l.photo,
+      photos: photos.length ? photos : l.photos,
+      badge: document.getElementById('eBadge').value,
+      payments,
+      phone: document.getElementById('ePhone').value || l.phone,
+    };
+  });
+  saveListings(listings);
+  closeEditModal();
+  renderAdminListings();
+  renderListings();
+  showNotif('Listing updated successfully!');
+}
+
+function toggleListing(id) {
+  const listings = getListings().map(l => l.id === id ? {...l, active: !l.active} : l);
+  saveListings(listings);
+  renderAdminListings();
+  renderListings();
+}
+function deleteListing(id) {
+  if (!confirm('Delete this listing?')) return;
+  saveListings(getListings().filter(l => l.id !== id));
+  renderAdminListings();
+  renderListings();
+}
+
+function renderAdminRequests() {
+  const list = document.getElementById('adminRequestsList');
+  const reqs = getRequests();
+  if (!reqs.length) { list.innerHTML = '<p style="color:var(--muted);font-size:14px;">No requests yet.</p>'; return; }
+  list.innerHTML = reqs.map(r => `
+    <div class="req-item">
+      <h4>${r.name} — ${r.phone} ${r.status === 'new' ? '<span class="req-badge">New</span>' : ''}</h4>
+      <p>Looking for: ${r.type} in ${r.city} · Budget: ${r.budget || 'Not specified'} · Move-in: ${r.date || 'Flexible'}</p>
+      ${r.notes ? `<p style="margin-top:4px;font-style:italic;">"${r.notes}"</p>` : ''}
+      <p style="margin-top:6px;font-size:11px;color:#aaa;">Received: ${r.submitted}</p>
+      <a href="https://wa.me/${r.phone.replace(/\D/g,'')}" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;background:#25d366;color:white;padding:5px 14px;border-radius:6px;text-decoration:none;">Reply on WhatsApp</a>
+    </div>`).join('');
+  // mark all as seen
+  saveRequests(reqs.map(r => ({...r, status: 'seen'})));
+  document.getElementById('reqCount').textContent = '';
+}
+
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.style.display = 'block';
+  setTimeout(() => n.style.display = 'none', 3500);
+}
+
+/* ══════════
+   INIT
+══════════ */
+seedDemo();
+setLang('en');
+renderListings();
+</script>
+</body>
+</html>
