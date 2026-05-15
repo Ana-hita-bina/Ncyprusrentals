@@ -2033,6 +2033,7 @@ const translations = {
     all_types: 'All types', all_cities: 'All cities', any_budget: 'Any budget',
     props_found: 'properties found', available_props: 'Available properties',
     enquire: 'Enquire →', per_month: '/month',
+    wa_msg: (title, id) => `Hi Ana! I'm interested in: ${title}${id ? ' (#' + id + ')' : ''}`,
     empty_title: 'No properties match your search',
     empty_p: "Don't worry — We can find it for you personally.\nFill in the request form below and she'll get back to you fast.",
     empty_btn: 'Request my property →',
@@ -2075,6 +2076,7 @@ const translations = {
     all_types: 'Tüm tipler', all_cities: 'Tüm şehirler', any_budget: 'Herhangi bütçe',
     props_found: 'mülk bulundu', available_props: 'Mevcut mülkler',
     enquire: 'Bilgi al →', per_month: '/ay',
+    wa_msg: (title, id) => `Merhaba Ana! Şu mülkle ilgileniyorum: ${title}${id ? ' (#' + id + ')' : ''}`,
     empty_title: 'Aramanızla eşleşen mülk yok',
     empty_p: "Endişelenmeyin — Biz sizin için kişisel olarak bulabiliriz.\nAşağıdaki talep formunu doldurun, hızlıca geri dönsün.",
     empty_btn: 'Mülkümü talep et →',
@@ -2117,6 +2119,7 @@ const translations = {
     all_types: 'Все типы', all_cities: 'Все города', any_budget: 'Любой бюджет',
     props_found: 'объектов найдено', available_props: 'Доступные объекты',
     enquire: 'Узнать →', per_month: '/мес',
+    wa_msg: (title, id) => `Здравствуйте, Ана! Меня интересует: ${title}${id ? ' (#' + id + ')' : ''}`,
     empty_title: 'Объектов по вашему запросу не найдено',
     empty_p: "Не переживайте — Ана лично найдёт для вас лучший вариант.\nЗаполните форму запроса ниже — она свяжется быстро.",
     empty_btn: 'Запросить жильё →',
@@ -2329,7 +2332,8 @@ function renderListings(filters = {}) {
     const typeTag = T(typeTagMap[l.type]) || l.type;
     const bedsTagMap = { Studio:'beds_studio', '1':'beds_1', '2':'beds_2', '3':'beds_3', '4+':'beds_4' };
     const bedsTag = T(bedsTagMap[l.beds]) || l.beds;
-    const waLink = l.phone ? `https://wa.me/${l.phone.replace(/\D/g,'')}?text=Hi Ana! I'm interested in: ${encodeURIComponent(l.title)}` : '#';
+    const waMsg = translations[currentLang].wa_msg(getTrans(l,'title'), l.listingId);
+    const waLink = l.phone ? `https://wa.me/${l.phone.replace(/\D/g,'')}?text=${encodeURIComponent(waMsg)}` : '#';
     const photoCountBadge = '';
     const clickAttr = photos.length ? `onclick="openLightbox(${l.id})" style="cursor:pointer;"` : '';
     const listingId = l.listingId ? `<span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px;">#${l.listingId}</span>` : '';
