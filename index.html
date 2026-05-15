@@ -944,7 +944,97 @@ footer a:hover { color: var(--sky); }
 .lightbox-thumb.active { border-color: var(--sky); }
 .lightbox-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ─── RESPONSIVE ─── */
+/* ─── CLOUDINARY PHOTO UPLOADER ─── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--offwhite);
+  margin-bottom: 10px;
+}
+.upload-zone:hover, .upload-zone.dragging {
+  border-color: var(--ocean);
+  background: var(--mist);
+}
+.upload-zone-inner { display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.upload-zone-text { font-size: 14px; font-weight: 500; color: var(--ocean); }
+.upload-zone-sub { font-size: 11px; color: var(--muted); }
+.photo-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.photo-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--mist);
+  border: 1.5px solid var(--border);
+}
+.photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-thumb-num {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(26,58,82,.75);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 10px;
+  pointer-events: none;
+}
+.photo-thumb-del {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  background: rgba(200,0,0,.75);
+  color: #fff;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background .15s;
+}
+.photo-thumb-del:hover { background: rgba(200,0,0,1); }
+.photo-thumb.uploading { opacity: .55; }
+.photo-thumb.uploading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(26,111,168,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload-progress-bar {
+  background: var(--mist);
+  border-radius: 20px;
+  height: 6px;
+  overflow: hidden;
+  margin: 6px 0 2px;
+}
+.upload-progress-fill {
+  height: 100%;
+  background: var(--ocean);
+  border-radius: 20px;
+  transition: width .3s;
+}
+.upload-status-text { font-size: 12px; color: var(--ocean); font-weight: 500; }
+.upload-err { font-size: 12px; color: #cc3333; margin-top: 4px; }
+
 
 /* Tablet */
 @media (max-width: 900px) {
@@ -1314,9 +1404,21 @@ footer a:hover { color: var(--sky); }
           <!-- PHOTOS + BADGE -->
           <div class="admin-row">
             <div class="admin-group" style="grid-column:1/-1;">
-              <label>Photo URLs — paste up to 10 links, one per line</label>
-              <textarea id="aPhoto" placeholder="https://photo1.com/image.jpg&#10;https://photo2.com/image.jpg&#10;..." style="min-height:80px;font-size:12px;"></textarea>
-              <span style="font-size:11px;color:var(--muted);margin-top:4px;">Each line = one photo. First photo is the cover. Visitors can swipe all photos in the gallery.</span>
+              <label>Photos <span style="font-weight:400;color:var(--muted);">(up to 10 — first photo = cover)</span></label>
+              <!-- Upload zone -->
+              <div class="upload-zone" id="addUploadZone" onclick="document.getElementById('addPhotoInput').click()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="handleDrop(event,'aPhoto','addPreviewGrid','addUploadZone')">
+                <input type="file" id="addPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFileSelect(event,'aPhoto','addPreviewGrid')">
+                <div class="upload-zone-inner">
+                  <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="var(--ocean)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                  <div class="upload-zone-text">Tap to upload or drag photos here</div>
+                  <div class="upload-zone-sub">JPG, PNG, WEBP, HEIC · Max 10MB each · Auto-compressed</div>
+                </div>
+              </div>
+              <!-- Preview grid -->
+              <div class="photo-preview-grid" id="addPreviewGrid"></div>
+              <!-- Hidden textarea keeps URLs for form submission -->
+              <textarea id="aPhoto" style="display:none;"></textarea>
+              <div id="addUploadProgress" style="display:none;"></div>
             </div>
             <div class="admin-group">
               <label>Badge</label>
@@ -2529,8 +2631,19 @@ function openEditModal(id) {
             <textarea id="eDescRu" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;width:100%;outline:none;min-height:60px;resize:vertical;font-family:'DM Sans',sans-serif;">${esc(l.desc_ru)}</textarea></div>
           </div>
         </div>
-        <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Photo URLs — one per line</label>
-        <textarea id="ePhotos" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;width:100%;outline:none;min-height:80px;resize:vertical;font-family:monospace;">${(l.photos&&l.photos.length?l.photos:l.photo?[l.photo]:[]).join('\n')}</textarea></div>
+        <div>
+          <label style="font-size:12px;font-weight:500;display:block;margin-bottom:8px;">Photos <span style="font-weight:400;color:var(--muted);">(first photo = cover)</span></label>
+          <div class="upload-zone" id="editUploadZone" onclick="document.getElementById('editPhotoInput').click()" ondragover="event.preventDefault();this.classList.add('dragging')" ondragleave="this.classList.remove('dragging')" ondrop="handleDrop(event,'ePhotos','editPreviewGrid','editUploadZone')">
+            <input type="file" id="editPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFileSelect(event,'ePhotos','editPreviewGrid')">
+            <div class="upload-zone-inner">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="var(--ocean)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              <div class="upload-zone-text" style="font-size:13px;">Tap to add more photos</div>
+            </div>
+          </div>
+          <div class="photo-preview-grid" id="editPreviewGrid">${(l.photos&&l.photos.length?l.photos:l.photo?[l.photo]:[]).map((url,i)=>`<div class="photo-thumb" data-url="${url}"><img src="${url}" onerror="this.parentElement.style.background='#eee'"><span class="photo-thumb-num">${i+1}</span><button class="photo-thumb-del" onclick="removePhotoThumb(this,'ePhotos','editPreviewGrid')" title="Remove">✕</button></div>`).join('')}</div>
+          <textarea id="ePhotos" style="display:none;">${(l.photos&&l.photos.length?l.photos:l.photo?[l.photo]:[]).join('\n')}</textarea>
+          <div id="editUploadProgress" style="display:none;margin-top:8px;"></div>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">Badge</label>
           <select id="eBadge" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
@@ -2576,6 +2689,166 @@ loadListings().then(() => {
   renderListings();
   document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
 });
+
+/* ══════════════════════════════════════════
+   CLOUDINARY PHOTO UPLOADER
+   Cloud: dlmpgto04  |  Preset: ncyprusrentals (unsigned)
+══════════════════════════════════════════ */
+const CLD_CLOUD  = 'dlmpgto04';
+const CLD_PRESET = 'ncyprusrentals'; // unsigned preset you created
+
+/* Upload a single File object → returns Cloudinary secure_url */
+async function uploadToCloudinary(file, onProgress) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CLD_PRESET);
+  fd.append('folder', 'listings');
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLD_CLOUD}/image/upload`);
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) onProgress(Math.round(e.loaded / e.total * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        resolve(data.secure_url);
+      } else {
+        try {
+          const err = JSON.parse(xhr.responseText);
+          reject(new Error(err.error?.message || 'Upload failed'));
+        } catch(_) { reject(new Error('Upload failed')); }
+      }
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send(fd);
+  });
+}
+
+/* Sync hidden textarea from current thumbs in a preview grid */
+function syncPhotoTextarea(gridId, textareaId) {
+  const grid = document.getElementById(gridId);
+  const ta   = document.getElementById(textareaId);
+  if (!grid || !ta) return;
+  const urls = Array.from(grid.querySelectorAll('.photo-thumb[data-url]'))
+    .map(t => t.getAttribute('data-url'))
+    .filter(Boolean);
+  ta.value = urls.join('\n');
+  // re-number badges
+  grid.querySelectorAll('.photo-thumb-num').forEach((el, i) => el.textContent = i + 1);
+}
+
+/* Add a thumb card to preview grid */
+function addThumbToGrid(gridId, url, isUploading) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const count = grid.querySelectorAll('.photo-thumb').length + 1;
+  const div = document.createElement('div');
+  div.className = 'photo-thumb' + (isUploading ? ' uploading' : '');
+  div.setAttribute('data-url', url || '');
+  div.innerHTML = `
+    <img src="${url || ''}" onerror="this.style.display='none'">
+    <span class="photo-thumb-num">${count}</span>
+    <button class="photo-thumb-del" onclick="removePhotoThumb(this,'${gridId.replace('Grid','').toLowerCase() === 'add' ? 'aPhoto' : 'ePhotos'}','${gridId}')" title="Remove">✕</button>`;
+  grid.appendChild(div);
+  return div;
+}
+
+/* Remove a photo thumb and sync textarea */
+function removePhotoThumb(btn, textareaId, gridId) {
+  btn.closest('.photo-thumb').remove();
+  syncPhotoTextarea(gridId, textareaId);
+}
+
+/* Show/hide progress UI */
+function setProgress(progressDivId, done, total, err) {
+  const div = document.getElementById(progressDivId);
+  if (!div) return;
+  if (err) {
+    div.style.display = 'block';
+    div.innerHTML = `<div class="upload-err">⚠ ${err}</div>`;
+    return;
+  }
+  if (done === total) {
+    div.style.display = 'none';
+    div.innerHTML = '';
+    return;
+  }
+  div.style.display = 'block';
+  div.innerHTML = `
+    <div class="upload-status-text">Uploading ${done + 1} of ${total}…</div>
+    <div class="upload-progress-bar"><div class="upload-progress-fill" id="${progressDivId}Fill" style="width:0%"></div></div>`;
+}
+
+/* Handle file input change */
+async function handleFileSelect(event, textareaId, gridId) {
+  const files = Array.from(event.target.files);
+  event.target.value = ''; // reset so same file can be re-selected
+  await uploadFiles(files, textareaId, gridId);
+}
+
+/* Handle drag-and-drop */
+async function handleDrop(event, textareaId, gridId, zoneId) {
+  event.preventDefault();
+  document.getElementById(zoneId)?.classList.remove('dragging');
+  const files = Array.from(event.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  await uploadFiles(files, textareaId, gridId);
+}
+
+/* Core upload loop */
+async function uploadFiles(files, textareaId, gridId) {
+  const progressId = gridId.replace('PreviewGrid', 'UploadProgress')
+                           .replace('Grid', 'Progress');
+  const maxPhotos = 10;
+  const current = document.getElementById(gridId)?.querySelectorAll('.photo-thumb').length || 0;
+  const slots   = maxPhotos - current;
+
+  if (files.length === 0) return;
+  if (slots <= 0) { setProgress(progressId, 0, 0, 'Maximum 10 photos reached.'); return; }
+
+  const toUpload = files.slice(0, slots);
+
+  for (let i = 0; i < toUpload.length; i++) {
+    const file = toUpload[i];
+    setProgress(progressId, i, toUpload.length);
+
+    // Show placeholder thumb while uploading
+    const localURL = URL.createObjectURL(file);
+    const thumb = addThumbToGrid(gridId, localURL, true);
+    if (thumb) thumb.querySelector('img').src = localURL;
+
+    try {
+      const cloudURL = await uploadToCloudinary(file, pct => {
+        const fill = document.getElementById(progressId + 'Fill');
+        if (fill) fill.style.width = pct + '%';
+      });
+      // Replace blob URL with real Cloudinary URL
+      if (thumb) {
+        thumb.setAttribute('data-url', cloudURL);
+        thumb.querySelector('img').src = cloudURL;
+        thumb.classList.remove('uploading');
+        // Update del button references
+        const delBtn = thumb.querySelector('.photo-thumb-del');
+        if (delBtn) {
+          const ta = textareaId;
+          const gr = gridId;
+          delBtn.onclick = () => { thumb.remove(); syncPhotoTextarea(gr, ta); };
+        }
+        URL.revokeObjectURL(localURL);
+      }
+      syncPhotoTextarea(gridId, textareaId);
+    } catch(err) {
+      if (thumb) thumb.remove();
+      setProgress(progressId, i, toUpload.length, err.message);
+      return;
+    }
+  }
+  setProgress(progressId, toUpload.length, toUpload.length);
+  if (slots < files.length) {
+    setProgress(progressId, 0, 0, `Only ${slots} photo(s) uploaded — 10 photo limit reached.`);
+  }
+}
 
 /* ── end ── */
 </script>
