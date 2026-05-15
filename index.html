@@ -1234,8 +1234,8 @@ footer a:hover { color: var(--sky); }
           <div class="option-btn" onclick="toggleMultiFilter(this,'city','Iskele')" data-val="Iskele">
             <div class="opt-icon">🌊</div><div class="opt-label">Iskele</div>
           </div>
-          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Lefke')" data-val="Lefke">
-            <div class="opt-icon">🌿</div><div class="opt-label">Lefke</div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','Bogaz')" data-val="Bogaz">
+            <div class="opt-icon">🌿</div><div class="opt-label">Bogaz</div>
           </div>
         </div>
       </div>
@@ -1320,7 +1320,7 @@ footer a:hover { color: var(--sky); }
               <select id="aCity" required>
                 <option value="">Select city</option>
                 <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
-                <option>Iskele</option><option>Lefke</option><option>Other</option>
+                <option>Iskele</option><option>Bogaz</option><option>Other</option>
               </select>
             </div>
           </div>
@@ -1545,7 +1545,7 @@ footer a:hover { color: var(--sky); }
     <select id="qCity" onchange="quickSearch()">
       <option value="">All cities</option>
       <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
-      <option>Iskele</option><option>Lefke</option>
+      <option>Iskele</option><option>Bogaz</option>
     </select>
     <select id="qType" onchange="quickSearch()">
       <option value="" data-i18n="all_types">All types</option>
@@ -1674,7 +1674,7 @@ footer a:hover { color: var(--sky); }
     <a href="#">Famagusta</a>
     <a href="#">Nicosia</a>
     <a href="#">Iskele</a>
-    <a href="#">Lefke</a>
+    <a href="#">Bogaz</a>
   </div>
   <div>
     <h4>Contact</h4>
@@ -2591,7 +2591,7 @@ function openEditModal(id) {
             <input id="eListingId" value="${esc(l.listingId)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:monospace;width:100%;outline:none;"></div>
             <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">City</label>
             <select id="eCity" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
-              ${['Kyrenia','Famagusta','Nicosia','Iskele','Lefke','Other'].map(c=>`<option ${l.city===c?'selected':''}>${c}</option>`).join('')}
+              ${['Kyrenia','Famagusta','Nicosia','Iskele','Bogaz','Other'].map(c=>`<option ${l.city===c?'selected':''}>${c}</option>`).join('')}
             </select></div>
           </div>
         </div>
