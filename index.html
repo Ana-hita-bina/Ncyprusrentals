@@ -6,6 +6,8 @@
 <title>N.Cyprus.Rentals — Find Your Home in Northern Cyprus</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Cloudflare Turnstile — bot protection -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
 :root {
   --ocean: #1a6fa8;
@@ -25,6 +27,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body { font-family: 'DM Sans', sans-serif; background: var(--offwhite); color: var(--text); min-height: 100vh; }
+
+/* ─── HONEYPOT — invisible to humans, bots fill it in ─── */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  tab-index: -1;
+}
 
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 6px; }
@@ -1306,6 +1320,7 @@ footer a:hover { color: var(--sky); }
     <div class="admin-tabs">
       <div class="admin-tab active" onclick="switchTab('add')">Add Listing</div>
       <div class="admin-tab" onclick="switchTab('manage')">Manage Listings</div>
+      <div class="admin-tab" onclick="switchTab('pending')">Pending <span id="pendingCount" style="background:#e67e22;color:white;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:4px;"></span></div>
       <div class="admin-tab" onclick="switchTab('requests')">Requests <span id="reqCount" style="background:#1a6fa8;color:white;font-size:10px;padding:2px 6px;border-radius:10px;margin-left:4px;"></span></div>
     </div>
     <div class="admin-content" id="adminContent">
@@ -1475,6 +1490,10 @@ footer a:hover { color: var(--sky); }
       <div id="tabRequests" style="display:none;">
         <div class="admin-requests-list" id="adminRequestsList"></div>
       </div>
+      <div id="tabPending" style="display:none;">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">These are listings submitted by landlords — review and approve or reject each one.</p>
+        <div id="adminPendingList"><p style="color:var(--muted);font-size:14px;">Loading…</p></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1525,6 +1544,7 @@ footer a:hover { color: var(--sky); }
   <div class="hero-btns">
     <button class="btn-primary" onclick="showFilterPopup()" data-i18n="hero_btn1">Find my home →</button>
     <a href="#request" class="btn-outline" data-i18n="hero_btn2">Request a property</a>
+    <button class="btn-outline" onclick="showSubmitListing()" style="border-color:var(--gold);color:var(--gold);" data-i18n="sl_btn">🏠 List your property — Free</button>
   </div>
 </section>
 
@@ -1688,6 +1708,172 @@ footer a:hover { color: var(--sky); }
   </div>
   <div class="footer-bottom">© 2025 N.Cyprus.Rentals · Made with care by Ana · Northern Cyprus</div>
 </footer>
+
+<!-- ════════════════════════════════════
+     SUBMIT LISTING MODAL (public)
+════════════════════════════════════ -->
+<div class="admin-overlay" id="submitListingOverlay" style="display:none;">
+  <div class="admin-panel" style="max-width:680px;">
+    <div class="admin-header">
+      <h2 data-i18n="sl_modal_title">🏠 List Your Property — Free</h2>
+      <button class="popup-close" onclick="closeSubmitListing()">✕</button>
+    </div>
+    <div style="padding:0 28px 8px;background:var(--mist);border-bottom:1px solid var(--border);">
+      <p style="font-size:13px;color:var(--muted);padding:12px 0;" data-i18n="sl_modal_sub">Fill in your property details. We'll review your listing and publish it within 24 hours — completely free. Your contact info stays private.</p>
+    </div>
+    <div class="admin-content" style="max-height:80vh;overflow-y:auto;">
+      <form class="admin-form" id="submitListingForm" onsubmit="submitPublicListing(event)">
+
+        <!-- CONTACT -->
+        <div style="background:var(--mist);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;" data-i18n="sl_contact_section">YOUR CONTACT INFO</div>
+          <div class="admin-row">
+            <div class="admin-group">
+              <label data-i18n="sl_your_name">Your name *</label>
+              <input type="text" id="slName" data-i18n-placeholder="sl_your_name_ph" placeholder="e.g. Ahmet Bey" required>
+            </div>
+            <div class="admin-group">
+              <label data-i18n="sl_your_phone">WhatsApp / Phone *</label>
+              <input type="tel" id="slPhone" data-i18n-placeholder="sl_your_phone_ph" placeholder="+90 533 ..." required>
+            </div>
+          </div>
+        </div>
+
+        <!-- CITY + TYPE + BEDS -->
+        <div class="admin-row">
+          <div class="admin-group">
+            <label data-i18n="sl_city">City *</label>
+            <select id="slCity" required>
+              <option value="">—</option>
+              <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
+              <option>Iskele</option><option>Bogaz</option><option>YeniBogazici</option><option>Other</option>
+            </select>
+          </div>
+          <div class="admin-group">
+            <label data-i18n="sl_type">Property type *</label>
+            <select id="slType" required>
+              <option value="">—</option>
+              <option>Villa</option><option>Flat</option><option>Penthouse</option>
+              <option>Studio</option><option>Room</option>
+            </select>
+          </div>
+        </div>
+        <div class="admin-row">
+          <div class="admin-group">
+            <label data-i18n="sl_beds">Bedrooms *</label>
+            <select id="slBeds" required>
+              <option value="">—</option>
+              <option value="Studio">Studio</option>
+              <option value="1">1 bedroom</option><option value="2">2 bedrooms</option>
+              <option value="3">3 bedrooms</option><option value="4+">4+ bedrooms</option>
+            </select>
+          </div>
+          <div class="admin-group">
+            <label data-i18n="sl_price">Monthly price (£) *</label>
+            <input type="number" id="slPrice" data-i18n-placeholder="sl_price_ph" placeholder="e.g. 350" required min="0">
+          </div>
+        </div>
+
+        <!-- PAYMENT OPTIONS -->
+        <div class="admin-group">
+          <label data-i18n="sl_payments">Payment options accepted</label>
+          <div class="admin-checkboxes">
+            <label class="check-label"><input type="checkbox" name="slPayment" value="Monthly" checked> <span data-i18n="pay_monthly">Monthly</span></label>
+            <label class="check-label"><input type="checkbox" name="slPayment" value="3 Months"> <span data-i18n="pay_3">3 Months</span></label>
+            <label class="check-label"><input type="checkbox" name="slPayment" value="6 Months"> <span data-i18n="pay_6">6 Months</span></label>
+            <label class="check-label"><input type="checkbox" name="slPayment" value="1 Year"> <span data-i18n="pay_year">1 Year</span></label>
+          </div>
+        </div>
+
+        <!-- TITLE — only the active language field shown -->
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;" data-i18n="sl_title_section">PROPERTY TITLE</div>
+          <div class="admin-group" id="sl_title_en">
+            <label>🇬🇧 <span data-i18n="sl_title_label">English title *</span></label>
+            <input type="text" id="slTitle" data-i18n-placeholder="sl_title_ph" placeholder="e.g. 2+1 Flat, Sea View, Central Kyrenia">
+          </div>
+          <div class="admin-group" id="sl_title_tr" style="display:none;">
+            <label>🇹🇷 <span data-i18n="sl_title_label">Turkish title *</span></label>
+            <input type="text" id="slTitleTr" data-i18n-placeholder="sl_title_ph" placeholder="ör. Deniz manzaralı 2+1 daire">
+          </div>
+          <div class="admin-group" id="sl_title_ru" style="display:none;">
+            <label>🇷🇺 <span data-i18n="sl_title_label">Russian title *</span></label>
+            <input type="text" id="slTitleRu" data-i18n-placeholder="sl_title_ph" placeholder="напр. Квартира 2+1">
+          </div>
+        </div>
+
+        <!-- ADDRESS -->
+        <div class="admin-group">
+          <label data-i18n="sl_address">Full address / area</label>
+          <input type="text" id="slAddress" data-i18n-placeholder="sl_address_ph" placeholder="e.g. Central Kyrenia, near the harbour">
+        </div>
+
+        <!-- DESCRIPTION — only the active language field shown -->
+        <div style="background:var(--offwhite);border-radius:10px;padding:14px;border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:600;color:var(--ocean);letter-spacing:0.08em;margin-bottom:10px;" data-i18n="sl_desc_section">DESCRIPTION</div>
+          <div class="admin-group" id="sl_desc_en">
+            <label>🇬🇧 <span data-i18n="sl_desc_label">English description *</span></label>
+            <textarea id="slDesc" data-i18n-placeholder="sl_desc_ph" placeholder="Describe the property — size, features, nearby places..."></textarea>
+          </div>
+          <div class="admin-group" id="sl_desc_tr" style="display:none;">
+            <label>🇹🇷 <span data-i18n="sl_desc_label">Turkish description *</span></label>
+            <textarea id="slDescTr" data-i18n-placeholder="sl_desc_ph" placeholder="Mülkü açıklayın..."></textarea>
+          </div>
+          <div class="admin-group" id="sl_desc_ru" style="display:none;">
+            <label>🇷🇺 <span data-i18n="sl_desc_label">Russian description *</span></label>
+            <textarea id="slDescRu" data-i18n-placeholder="sl_desc_ph" placeholder="Опишите объект..."></textarea>
+          </div>
+        </div>
+
+        <!-- PHOTOS -->
+        <div class="admin-group">
+          <label><span data-i18n="sl_photos">Photos</span> <span style="font-weight:400;color:var(--muted);" data-i18n="sl_photos_sub">(up to 10 — first photo = cover)</span></label>
+          <div class="upload-zone" id="slUploadZone"
+            onclick="document.getElementById('slPhotoInput').click()"
+            ondragover="event.preventDefault();this.classList.add('dragging')"
+            ondragleave="this.classList.remove('dragging')"
+            ondrop="handleDrop(event,'slPhoto','slPreviewGrid','slUploadZone')">
+            <input type="file" id="slPhotoInput" accept="image/*" multiple style="display:none" onchange="handleFileSelect(event,'slPhoto','slPreviewGrid')">
+            <div class="upload-zone-inner">
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="var(--ocean)" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              <div class="upload-zone-text">Tap to upload or drag photos here</div>
+              <div class="upload-zone-sub">JPG, PNG, WEBP, HEIC · Max 10MB each · Auto-compressed</div>
+            </div>
+          </div>
+          <div class="photo-preview-grid" id="slPreviewGrid"></div>
+          <textarea id="slPhoto" style="display:none;"></textarea>
+          <div id="slUploadProgress" style="display:none;"></div>
+        </div>
+
+        <div style="background:var(--mist);border-radius:10px;padding:12px 14px;border:1px solid var(--border);font-size:13px;color:var(--muted);" data-i18n="sl_note">
+          ℹ️ Your listing will be reviewed by our team and published within 24 hours once approved.
+        </div>
+
+        <!-- HONEYPOT — hidden field, bots fill it in, humans never see it -->
+        <div class="hp-field" aria-hidden="true">
+          <label for="sl_website">Website</label>
+          <input type="text" id="sl_website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <!-- CLOUDFLARE TURNSTILE — renders a challenge widget -->
+        <div id="sl-turnstile-wrap" style="display:flex;justify-content:center;margin:4px 0;">
+          <div class="cf-turnstile"
+            data-sitekey="0x4AAAAAADQoxv2YVpxbOxh0"
+            data-theme="light"
+            data-size="normal"
+            id="slTurnstile">
+          </div>
+        </div>
+        <p id="sl-turnstile-err" style="display:none;text-align:center;font-size:12px;color:#cc3333;margin-top:-6px;">Please complete the security check above.</p>
+
+        <button type="submit" class="btn-add" style="background:var(--ocean);width:100%;padding:14px;font-size:15px;" data-i18n="sl_submit">Submit my listing for review →</button>
+        <div id="slSuccess" style="display:none;background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.4);border-radius:10px;padding:16px;text-align:center;color:#27ae60;font-size:15px;" data-i18n="sl_success">
+          ✅ Your listing was submitted! We'll review it and get in touch with you within 24 hours.
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Admin access: secret double-click on logo -->
 <script>
@@ -1857,6 +2043,14 @@ async function addListing(e) {
     renderListings();
     document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
     renderAdminListings();
+    // if this was pre-filled from a pending submission, mark it approved
+    const tabAdd = document.getElementById('tabAdd');
+    const pendingId = tabAdd.getAttribute('data-pending-id');
+    if (pendingId) {
+      try { await sbUpdate('pending_listings', parseInt(pendingId), { status: 'approved' }); } catch(_) {}
+      tabAdd.removeAttribute('data-pending-id');
+      document.getElementById('pendingCount').textContent = '';
+    }
   } catch(err) {
     alert('Error saving listing: ' + err.message);
   }
@@ -1968,6 +2162,13 @@ async function openAdmin() {
   renderAdminRequests();
   const newReqs = _requestsCache.filter(r => r.status === 'new');
   document.getElementById('reqCount').textContent = newReqs.length || '';
+  // load pending listings count
+  try {
+    const pending = await sbGet('pending_listings', 'status=eq.pending');
+    document.getElementById('pendingCount').textContent = pending.length || '';
+  } catch(e) {
+    document.getElementById('pendingCount').textContent = '';
+  }
 }
 
 async function renderAdminRequests() {
@@ -2059,6 +2260,25 @@ const translations = {
     rform_notes: 'Any specific requirements?', rform_notes_ph: 'Furnished, pets allowed, near university, parking, sea view...',
     rform_submit: 'Send my request — We will reply fast →',
     rform_success: 'Your request was sent! We will contact you within 24 hours.',
+    sl_btn: '🏠 List your property — Free',
+    sl_modal_title: '🏠 List Your Property — Free',
+    sl_modal_sub: "Fill in your property details. We'll review your listing and publish it within 24 hours — completely free. Your contact info stays private.",
+    sl_contact_section: 'YOUR CONTACT INFO',
+    sl_your_name: 'Your name *', sl_your_name_ph: 'e.g. Ahmet Bey',
+    sl_your_phone: 'WhatsApp / Phone *', sl_your_phone_ph: '+90 533 ...',
+    sl_city: 'City *', sl_type: 'Property type *', sl_beds: 'Bedrooms *',
+    sl_price: 'Monthly price (£) *', sl_price_ph: 'e.g. 350',
+    sl_payments: 'Payment options accepted',
+    sl_title_section: 'PROPERTY TITLE',
+    sl_title_label: '🇬🇧 English title *', sl_title_ph: 'e.g. 2+1 Flat, Sea View, Central Kyrenia',
+    sl_title_opt: '(optional)',
+    sl_address: 'Full address / area', sl_address_ph: 'e.g. Central Kyrenia, near the harbour',
+    sl_desc_section: 'DESCRIPTION',
+    sl_desc_label: '🇬🇧 English description *', sl_desc_ph: 'Describe the property — size, features, nearby places...',
+    sl_photos: 'Photos', sl_photos_sub: '(up to 10 — first photo = cover)',
+    sl_note: "ℹ️ Your listing will be reviewed by our team and published within 24 hours once approved.",
+    sl_submit: 'Submit my listing for review →',
+    sl_success: "✅ Your listing was submitted! We'll review it and get in touch within 24 hours.",
   },
   tr: {
     nav_listings: 'İlanlar', nav_request: 'Ev talep et', nav_about: 'Hakkımızda',
@@ -2102,6 +2322,25 @@ const translations = {
     rform_notes: 'Özel gereksinimleriniz var mı?', rform_notes_ph: 'Mobilyalı, evcil hayvan kabul, üniversiteye yakın, otopark, deniz manzarası...',
     rform_submit: 'Talebimi gönder — Biz hızlıca yanıt verecek →',
     rform_success: 'Talebiniz gönderildi! Biz 24 saat içinde sizinle iletişime geçecek.',
+    sl_btn: '🏠 Mülkünüzü ücretsiz listeleyin',
+    sl_modal_title: '🏠 Mülkünüzü Listeleyin — Ücretsiz',
+    sl_modal_sub: 'Mülk bilgilerinizi doldurun. İlanınızı inceleyip 24 saat içinde yayınlayacağız — tamamen ücretsiz. İletişim bilgileriniz gizli kalır.',
+    sl_contact_section: 'İLETİŞİM BİLGİLERİNİZ',
+    sl_your_name: 'Adınız *', sl_your_name_ph: 'ör. Ahmet Bey',
+    sl_your_phone: 'WhatsApp / Telefon *', sl_your_phone_ph: '+90 533 ...',
+    sl_city: 'Şehir *', sl_type: 'Mülk tipi *', sl_beds: 'Yatak odası *',
+    sl_price: 'Aylık kira (£) *', sl_price_ph: 'ör. 350',
+    sl_payments: 'Kabul edilen ödeme seçenekleri',
+    sl_title_section: 'MÜLK BAŞLIĞI',
+    sl_title_label: '🇹🇷 Türkçe başlık *', sl_title_ph: 'ör. Deniz manzaralı 2+1 daire, Girne merkez',
+    sl_title_opt: '(isteğe bağlı)',
+    sl_address: 'Tam adres / bölge', sl_address_ph: 'ör. Girne merkezi, limana yakın',
+    sl_desc_section: 'AÇIKLAMA',
+    sl_desc_label: '🇹🇷 Türkçe açıklama *', sl_desc_ph: 'Mülkü açıklayın — büyüklük, özellikler, yakın yerler...',
+    sl_photos: 'Fotoğraflar', sl_photos_sub: '(en fazla 10 — ilk fotoğraf kapak)',
+    sl_note: 'ℹ️ İlanınız ekibimiz tarafından incelendikten sonra 24 saat içinde yayınlanacaktır.',
+    sl_submit: 'İlanımı incelemeye gönder →',
+    sl_success: '✅ İlanınız gönderildi! İnceleyip 24 saat içinde sizinle iletişime geçeceğiz.',
   },
   ru: {
     nav_listings: 'Объявления', nav_request: 'Запросить жильё', nav_about: 'Об Ане',
@@ -2145,6 +2384,25 @@ const translations = {
     rform_notes: 'Особые пожелания?', rform_notes_ph: 'Мебель, можно с питомцами, рядом с университетом, парковка, вид на море...',
     rform_submit: 'Отправить запрос — Ана ответит быстро →',
     rform_success: 'Ваш запрос отправлен! Ана свяжется с вами в течение 24 часов.',
+    sl_btn: '🏠 Разместить объявление — Бесплатно',
+    sl_modal_title: '🏠 Разместите ваш объект — Бесплатно',
+    sl_modal_sub: 'Заполните данные объекта. Мы проверим ваше объявление и опубликуем в течение 24 часов — совершенно бесплатно. Ваши контакты останутся конфиденциальными.',
+    sl_contact_section: 'ВАШИ КОНТАКТНЫЕ ДАННЫЕ',
+    sl_your_name: 'Ваше имя *', sl_your_name_ph: 'напр. Иван / Мария',
+    sl_your_phone: 'WhatsApp / Телефон *', sl_your_phone_ph: '+7 или +90...',
+    sl_city: 'Город *', sl_type: 'Тип недвижимости *', sl_beds: 'Спальни *',
+    sl_price: 'Месячная аренда (£) *', sl_price_ph: 'напр. 350',
+    sl_payments: 'Принимаемые варианты оплаты',
+    sl_title_section: 'НАЗВАНИЕ ОБЪЕКТА',
+    sl_title_label: '🇷🇺 Название на русском *', sl_title_ph: 'напр. Квартира 2+1, вид на море, центр Кирении',
+    sl_title_opt: '(необязательно)',
+    sl_address: 'Полный адрес / район', sl_address_ph: 'напр. Центр Кирении, рядом с гаванью',
+    sl_desc_section: 'ОПИСАНИЕ',
+    sl_desc_label: '🇷🇺 Описание на русском *', sl_desc_ph: 'Опишите объект — размер, особенности, рядом что есть...',
+    sl_photos: 'Фотографии', sl_photos_sub: '(до 10 — первое фото = обложка)',
+    sl_note: 'ℹ️ Ваше объявление будет проверено нашей командой и опубликовано в течение 24 часов после одобрения.',
+    sl_submit: 'Отправить объявление на проверку →',
+    sl_success: '✅ Ваше объявление отправлено! Мы проверим его и свяжемся с вами в течение 24 часов.',
   }
 };
 
@@ -2173,13 +2431,31 @@ function setLang(lang) {
   const statLabels = document.querySelectorAll('.stat-label');
   const keys = ['stat_listings','stat_cities','stat_response','stat_trust'];
   statLabels.forEach((el,i) => { if(keys[i] && t[keys[i]]) el.textContent = t[keys[i]]; });
-  // quick search placeholders
+  // update quick search placeholders
   const qCity = document.getElementById('qCity');
   const qType = document.getElementById('qType');
   const qBudget = document.getElementById('qBudget');
   if(qCity) qCity.options[0].text = t.all_cities || 'All cities';
   if(qType) qType.options[0].text = t.all_types || 'All types';
   if(qBudget) qBudget.options[0].text = t.any_budget || 'Any budget';
+  // switch visible title/description fields in submit listing form
+  ['en','tr','ru'].forEach(l => {
+    const tEl = document.getElementById('sl_title_' + l);
+    const dEl = document.getElementById('sl_desc_' + l);
+    if (tEl) tEl.style.display = l === lang ? 'flex' : 'none';
+    if (dEl) dEl.style.display = l === lang ? 'flex' : 'none';
+  });
+  // manage required attributes so only visible field is required
+  const titleIds = { en: 'slTitle', tr: 'slTitleTr', ru: 'slTitleRu' };
+  const descIds  = { en: 'slDesc',  tr: 'slDescTr',  ru: 'slDescRu'  };
+  Object.entries(titleIds).forEach(([l, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.required = l === lang;
+  });
+  Object.entries(descIds).forEach(([l, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.required = l === lang;
+  });
 }
 
 function T(key) { return translations[currentLang][key] || translations.en[key] || key; }
@@ -2513,11 +2789,12 @@ function closeAdmin() {
 }
 function switchTab(tab) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('#tabAdd,#tabManage,#tabRequests').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('#tabAdd,#tabManage,#tabRequests,#tabPending').forEach(t => t.style.display = 'none');
   event.target.classList.add('active');
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
   if (tab === 'manage') renderAdminListings();
   if (tab === 'requests') renderAdminRequests();
+  if (tab === 'pending') renderPendingListings();
 }
 
 /* helper: get translated field for current lang */
@@ -2858,7 +3135,267 @@ async function uploadFiles(files, textareaId, gridId) {
   }
 }
 
-/* ── end ── */
+/* ══════════════════════════════════════════
+   PUBLIC SUBMIT LISTING (landlord form)
+══════════════════════════════════════════ */
+function showSubmitListing() {
+  document.getElementById('submitListingOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  // ensure the form reflects the currently active language
+  setLang(currentLang);
+  document.getElementById('slSuccess').style.display = 'none';
+}
+
+function closeSubmitListing() {
+  document.getElementById('submitListingOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('submitListingOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSubmitListing();
+});
+
+async function submitPublicListing(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type=submit]');
+
+  // ── HONEYPOT CHECK — if the hidden field has a value, it's a bot ──
+  const hp = document.getElementById('sl_website');
+  if (hp && hp.value.trim() !== '') {
+    // silently pretend it worked — don't let bots know they were caught
+    document.getElementById('slSuccess').style.display = 'block';
+    return;
+  }
+
+  // ── TURNSTILE CHECK — get the token from the widget ──
+  const turnstileEl = document.querySelector('#slTurnstile [name="cf-turnstile-response"]');
+  const turnstileToken = turnstileEl ? turnstileEl.value : '';
+  if (!turnstileToken) {
+    document.getElementById('sl-turnstile-err').style.display = 'block';
+    return;
+  }
+  document.getElementById('sl-turnstile-err').style.display = 'none';
+
+  btn.textContent = '…'; btn.disabled = true;
+
+  const photoRaw = document.getElementById('slPhoto').value;
+  const photos   = photoRaw.split('\n').map(u => u.trim()).filter(Boolean);
+  const payments = Array.from(document.querySelectorAll('#submitListingForm input[name=slPayment]:checked')).map(c => c.value);
+
+  // read title/desc from whichever language field is active
+  const titleEn = document.getElementById('slTitle').value;
+  const titleTr = document.getElementById('slTitleTr').value;
+  const titleRu = document.getElementById('slTitleRu').value;
+  const descEn  = document.getElementById('slDesc').value;
+  const descTr  = document.getElementById('slDescTr').value;
+  const descRu  = document.getElementById('slDescRu').value;
+
+  const mainTitle = titleEn || titleTr || titleRu;
+  const mainDesc  = descEn  || descTr  || descRu;
+
+  const row = {
+    landlord_name:  document.getElementById('slName').value,
+    landlord_phone: document.getElementById('slPhone').value,
+    city:           document.getElementById('slCity').value,
+    type:           document.getElementById('slType').value,
+    beds:           document.getElementById('slBeds').value,
+    price:          parseFloat(document.getElementById('slPrice').value) || 0,
+    payments,
+    title:          titleEn || mainTitle,
+    title_tr:       titleTr,
+    title_ru:       titleRu,
+    address:        document.getElementById('slAddress').value,
+    description:    descEn || mainDesc,
+    desc_tr:        descTr,
+    desc_ru:        descRu,
+    photo:          photos[0] || '',
+    photos,
+    status:         'pending',
+  };
+
+  try {
+    await sbInsert('pending_listings', row);
+    document.getElementById('slSuccess').style.display = 'block';
+    document.getElementById('slSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    e.target.querySelectorAll('input:not([type=checkbox]),select,textarea').forEach(el => el.value = '');
+    document.getElementById('slPreviewGrid').innerHTML = '';
+    document.getElementById('slPhoto').value = '';
+    // reset Turnstile widget for next use
+    if (window.turnstile) window.turnstile.reset('#slTurnstile');
+    btn.textContent = T('sl_submit'); btn.disabled = false;
+    try {
+      const pending = await sbGet('pending_listings', 'status=eq.pending');
+      document.getElementById('pendingCount').textContent = pending.length || '';
+    } catch(_) {}
+  } catch(err) {
+    alert('Could not submit: ' + err.message);
+    if (window.turnstile) window.turnstile.reset('#slTurnstile');
+    btn.textContent = T('sl_submit'); btn.disabled = false;
+  }
+}
+
+/* ══════════════════════════════════════════
+   PENDING LISTINGS — admin review
+══════════════════════════════════════════ */
+let _pendingCache = [];
+
+async function renderPendingListings() {
+  const container = document.getElementById('adminPendingList');
+  container.innerHTML = '<p style="color:var(--muted);font-size:14px;">Loading…</p>';
+  try {
+    _pendingCache = await sbGet('pending_listings', 'status=eq.pending');
+  } catch(e) {
+    container.innerHTML = '<p style="color:#cc3333;font-size:13px;">Could not load pending listings.<br><small>Make sure the <code>pending_listings</code> table exists in Supabase.</small></p>';
+    return;
+  }
+  if (!_pendingCache.length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:14px;">No pending submissions — all clear! ✅</p>';
+    document.getElementById('pendingCount').textContent = '';
+    return;
+  }
+  document.getElementById('pendingCount').textContent = _pendingCache.length;
+  container.innerHTML = _pendingCache.map(p => `
+    <div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;background:var(--offwhite);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <span style="font-size:15px;font-weight:600;color:var(--navy);">${p.title||'(no title)'}</span>
+            <span style="font-size:11px;background:var(--mist);color:var(--ocean);padding:2px 8px;border-radius:10px;">${p.city}</span>
+            <span style="font-size:11px;background:var(--mist);color:var(--ocean);padding:2px 8px;border-radius:10px;">${p.type}</span>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:4px;">£${p.price}/mo · ${p.beds} bed · ${(p.payments||[]).join(', ')}</p>
+          ${p.address ? `<p style="font-size:12px;color:var(--muted);">📍 ${p.address}</p>` : ''}
+          <p style="font-size:13px;color:var(--text);margin-top:6px;line-height:1.5;">${(p.description||'').slice(0,180)}${(p.description||'').length>180?'…':''}</p>
+          ${p.photos && p.photos.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">${p.photos.slice(0,4).map(url=>`<img src="${url}" style="width:70px;height:54px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.style.display='none'">`).join('')}${p.photos.length>4?`<div style="width:70px;height:54px;border-radius:6px;border:1px solid var(--border);background:var(--mist);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);">+${p.photos.length-4}</div>`:''}` : ''}
+          <div style="margin-top:10px;padding:10px 12px;background:#fff8e6;border-radius:8px;border:1px solid #f5c842;">
+            <span style="font-size:11px;font-weight:600;color:#856404;">🔒 LANDLORD:</span>
+            <span style="font-size:13px;color:var(--text);margin-left:8px;">${p.landlord_name||'—'}</span>
+            <a href="https://wa.me/${(p.landlord_phone||'').replace(/\D/g,'')}" target="_blank" style="margin-left:10px;font-size:12px;background:#25d366;color:white;padding:3px 10px;border-radius:5px;text-decoration:none;">📱 ${p.landlord_phone||'—'}</a>
+          </div>
+          <p style="font-size:11px;color:#aaa;margin-top:6px;">Submitted: ${p.created_at ? new Date(p.created_at).toLocaleString() : ''}</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <button onclick="approvePending(${p.id})" style="background:var(--ocean);color:white;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">✅ Approve & Publish</button>
+        <button onclick="openApproveWithEdit(${p.id})" style="background:var(--mist);color:var(--ocean);border:1px solid var(--border);padding:9px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;">✏️ Edit then Publish</button>
+        <button onclick="rejectPending(${p.id})" style="background:#fff0f0;color:#cc3333;border:1px solid #ffcccc;padding:9px 20px;border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">✕ Reject</button>
+      </div>
+    </div>`).join('');
+}
+
+async function approvePending(pendingId) {
+  const p = _pendingCache.find(x => x.id === pendingId);
+  if (!p) return;
+  if (!confirm('Approve and publish this listing?')) return;
+
+  // auto-generate a listing ID
+  const autoId = p.city.substring(0,3).toUpperCase() + Date.now().toString().slice(-4);
+
+  const row = localToDb({
+    listingId:    autoId,
+    title:        p.title || '',
+    title_tr:     p.title_tr || '',
+    title_ru:     p.title_ru || '',
+    city:         p.city || '',
+    type:         p.type || '',
+    beds:         p.beds || '',
+    price:        p.price || 0,
+    address:      p.address || '',
+    desc:         p.description || '',
+    desc_tr:      p.desc_tr || '',
+    desc_ru:      p.desc_ru || '',
+    photo:        p.photo || '',
+    photos:       p.photos || [],
+    badge:        '',
+    payments:     p.payments || [],
+    phone:        p.landlord_phone || '+905391182520',
+    landlordName: p.landlord_name || '',
+    landlordPhone:p.landlord_phone || '',
+    privateNotes: 'Submitted via website listing form.',
+    active:       true,
+  });
+
+  try {
+    const [inserted] = await sbInsert('listings', row);
+    _listingsCache.unshift(dbToLocal(inserted));
+    // mark pending as approved
+    await sbUpdate('pending_listings', pendingId, { status: 'approved' });
+    _pendingCache = _pendingCache.filter(x => x.id !== pendingId);
+    renderPendingListings();
+    renderListings();
+    document.getElementById('statListings').textContent = _listingsCache.filter(l => l.active).length;
+    showNotif('✅ Listing approved and published as #' + autoId + '!');
+  } catch(err) {
+    alert('Error approving: ' + err.message);
+  }
+}
+
+function openApproveWithEdit(pendingId) {
+  const p = _pendingCache.find(x => x.id === pendingId);
+  if (!p) return;
+  // Pre-fill the Add Listing tab and switch to it so admin can review/edit before publishing
+  switchTabById('add');
+  document.getElementById('aTitle').value       = p.title || '';
+  document.getElementById('aTitleTr').value     = p.title_tr || '';
+  document.getElementById('aTitleRu').value     = p.title_ru || '';
+  document.getElementById('aCity').value        = p.city || '';
+  document.getElementById('aType').value        = p.type || '';
+  document.getElementById('aBeds').value        = p.beds || '';
+  document.getElementById('aPrice').value       = p.price || '';
+  document.getElementById('aAddress').value     = p.address || '';
+  document.getElementById('aDesc').value        = p.description || '';
+  document.getElementById('aDescTr').value      = p.desc_tr || '';
+  document.getElementById('aDescRu').value      = p.desc_ru || '';
+  document.getElementById('aPhone').value       = p.landlord_phone || '';
+  document.getElementById('aLandlordName').value  = p.landlord_name || '';
+  document.getElementById('aLandlordPhone').value = p.landlord_phone || '';
+  document.getElementById('aPrivateNotes').value  = 'Submitted via website listing form.';
+  // Restore photos
+  const grid = document.getElementById('addPreviewGrid');
+  const ta   = document.getElementById('aPhoto');
+  grid.innerHTML = '';
+  ta.value = '';
+  if (p.photos && p.photos.length) {
+    p.photos.forEach((url, i) => {
+      const div = document.createElement('div');
+      div.className = 'photo-thumb';
+      div.setAttribute('data-url', url);
+      div.innerHTML = `<img src="${url}"><span class="photo-thumb-num">${i+1}</span><button class="photo-thumb-del" onclick="removePhotoThumb(this,'aPhoto','addPreviewGrid')" title="Remove">✕</button>`;
+      grid.appendChild(div);
+    });
+    ta.value = p.photos.join('\n');
+  }
+  // Auto-fill listing ID suggestion
+  const autoId = p.city.substring(0,3).toUpperCase() + Date.now().toString().slice(-4);
+  document.getElementById('aListingId').value = autoId;
+  // Mark this pending id so we can reject it after successful add
+  document.getElementById('tabAdd').setAttribute('data-pending-id', pendingId);
+  showNotif('📋 Form pre-filled from pending submission. Review, then click "Add listing to website".');
+  document.getElementById('adminContent').scrollTop = 0;
+}
+
+function switchTabById(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#tabAdd,#tabManage,#tabRequests,#tabPending').forEach(t => t.style.display = 'none');
+  // find the tab button by text
+  const tabs = document.querySelectorAll('.admin-tab');
+  tabs.forEach(t => { if (t.textContent.trim().toLowerCase().startsWith(tab)) t.classList.add('active'); });
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+}
+
+async function rejectPending(pendingId) {
+  if (!confirm('Reject and delete this pending listing?')) return;
+  try {
+    await sbUpdate('pending_listings', pendingId, { status: 'rejected' });
+    _pendingCache = _pendingCache.filter(x => x.id !== pendingId);
+    renderPendingListings();
+    showNotif('Pending listing rejected.');
+  } catch(err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+/* ── end ──  */
 </script>
 </body>
 </html>
