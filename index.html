@@ -1237,6 +1237,9 @@ footer a:hover { color: var(--sky); }
           <div class="option-btn" onclick="toggleMultiFilter(this,'city','Bogaz')" data-val="Bogaz">
             <div class="opt-icon">🌿</div><div class="opt-label">Bogaz</div>
           </div>
+          <div class="option-btn" onclick="toggleMultiFilter(this,'city','YeniBogazici')" data-val="YeniBogazici">
+            <div class="opt-icon">🏖️</div><div class="opt-label">YeniBogazici</div>
+          </div>
         </div>
       </div>
 
@@ -1320,7 +1323,7 @@ footer a:hover { color: var(--sky); }
               <select id="aCity" required>
                 <option value="">Select city</option>
                 <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
-                <option>Iskele</option><option>Bogaz</option><option>Other</option>
+                <option>Iskele</option><option>Bogaz</option><option>YeniBogazici</option><option>Other</option>
               </select>
             </div>
           </div>
@@ -1528,7 +1531,7 @@ footer a:hover { color: var(--sky); }
 <!-- STATS -->
 <div class="stats-bar">
   <div class="stat"><div class="stat-num" id="statListings">0</div><div class="stat-label">Active listings</div></div>
-  <div class="stat"><div class="stat-num">5</div><div class="stat-label">Cities covered</div></div>
+  <div class="stat"><div class="stat-num">6</div><div class="stat-label">Cities covered</div></div>
   <div class="stat"><div class="stat-num">24h</div><div class="stat-label">Response time</div></div>
   <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Trusted agent</div></div>
 </div>
@@ -1545,7 +1548,7 @@ footer a:hover { color: var(--sky); }
     <select id="qCity" onchange="quickSearch()">
       <option value="">All cities</option>
       <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
-      <option>Iskele</option><option>Bogaz</option>
+      <option>Iskele</option><option>Bogaz</option><option>YeniBogazici</option>
     </select>
     <select id="qType" onchange="quickSearch()">
       <option value="" data-i18n="all_types">All types</option>
@@ -1615,7 +1618,7 @@ footer a:hover { color: var(--sky); }
             <label data-i18n="rform_city">Preferred city</label>
             <select id="rCity">
               <option>Kyrenia</option><option>Famagusta</option><option>Nicosia</option>
-              <option>Iskele</option>
+              <option>Iskele</option><option>YeniBogazici</option>
               <option data-i18n="rform_no_pref">No preference</option>
             </select>
           </div>
@@ -1675,6 +1678,7 @@ footer a:hover { color: var(--sky); }
     <a href="#">Nicosia</a>
     <a href="#">Iskele</a>
     <a href="#">Bogaz</a>
+    <a href="#">YeniBogazici</a>
   </div>
   <div>
     <h4>Contact</h4>
@@ -2591,7 +2595,7 @@ function openEditModal(id) {
             <input id="eListingId" value="${esc(l.listingId)}" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:monospace;width:100%;outline:none;"></div>
             <div><label style="font-size:12px;font-weight:500;display:block;margin-bottom:5px;">City</label>
             <select id="eCity" style="border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;outline:none;">
-              ${['Kyrenia','Famagusta','Nicosia','Iskele','Bogaz','Other'].map(c=>`<option ${l.city===c?'selected':''}>${c}</option>`).join('')}
+              ${['Kyrenia','Famagusta','Nicosia','Iskele','Bogaz','YeniBogazici','Other'].map(c=>`<option ${l.city===c?'selected':''}>${c}</option>`).join('')}
             </select></div>
           </div>
         </div>
