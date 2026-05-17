@@ -768,7 +768,7 @@ footer a:hover { color: var(--sky); }
 
 /* ─── LANG SWITCHER ─── */
 .lang-switcher { display: flex; align-items: center; gap: 2px; background: var(--offwhite); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
-.lang-btn { background: none; border: none; font-size: 11px; font-weight: 500; color: var(--muted); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; letter-spacing: 0.04em; }
+.lang-btn { background: none; border: none; font-size: 12px; font-weight: 500; color: var(--muted); padding: 4px 9px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .2s; letter-spacing: 0.02em; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
 .lang-btn.active { background: var(--ocean); color: white; }
 .lang-btn:hover:not(.active) { background: var(--border); color: var(--text); }
 
@@ -1164,7 +1164,7 @@ footer a:hover { color: var(--sky); }
   .admin-overlay { padding: 10px; }
 
   /* LANG SWITCHER */
-  .lang-btn { font-size: 10px; padding: 3px 6px; }
+  .lang-btn { font-size: 11px; padding: 3px 7px; }
 
   /* ACTIVE FILTERS */
   .filter-chip { font-size: 11px; }
@@ -1196,6 +1196,22 @@ footer a:hover { color: var(--sky); }
       <p data-i18n="popup_sub">Select as many options as you like — we'll show all matching properties</p>
     </div>
     <div class="popup-body">
+
+      <!-- LANGUAGE STEP -->
+      <div class="filter-step" id="popupLangStep">
+        <div class="filter-step-title" style="font-size:13px;">🌐 Choose your language / Dil seçin / Выберите язык</div>
+        <div class="option-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="option-btn" id="popupLangEn" onclick="setPopupLang('en')" style="border-color:var(--ocean);background:var(--mist);">
+            <div class="opt-icon">🇬🇧</div><div class="opt-label" style="color:var(--ocean);font-weight:500;">English</div>
+          </div>
+          <div class="option-btn" id="popupLangTr" onclick="setPopupLang('tr')">
+            <div class="opt-icon">🇹🇷</div><div class="opt-label">Türkçe</div>
+          </div>
+          <div class="option-btn" id="popupLangRu" onclick="setPopupLang('ru')">
+            <div class="opt-icon">🇷🇺</div><div class="opt-label">Русский</div>
+          </div>
+        </div>
+      </div>
 
       <div class="filter-step">
         <div class="filter-step-title" data-i18n="filter_type">What type of property?</div>
@@ -1509,17 +1525,17 @@ footer a:hover { color: var(--sky); }
     <a href="#about" data-i18n="nav_about">About us</a>
     <a href="https://wa.me/905391182520" target="_blank" style="color:#25d366;font-weight:500;" data-i18n="nav_whatsapp">WhatsApp</a>
     <div class="lang-switcher">
-      <button class="lang-btn active" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('tr')">TR</button>
-      <button class="lang-btn" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">🇬🇧 EN</button>
+      <button class="lang-btn" data-lang="tr" onclick="setLang('tr')">🇹🇷 TR</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">🇷🇺 RU</button>
     </div>
     <a href="#" class="nav-cta" onclick="showFilterPopup();return false;" data-i18n="nav_search">Search now</a>
   </div>
   <div style="display:flex;align-items:center;gap:6px;">
     <div class="lang-switcher">
-      <button class="lang-btn active" onclick="setLang('en')" id="mLangEn">EN</button>
-      <button class="lang-btn" onclick="setLang('tr')" id="mLangTr">TR</button>
-      <button class="lang-btn" onclick="setLang('ru')" id="mLangRu">RU</button>
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')" id="mLangEn">🇬🇧 EN</button>
+      <button class="lang-btn" data-lang="tr" onclick="setLang('tr')" id="mLangTr">🇹🇷 TR</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')" id="mLangRu">🇷🇺 RU</button>
     </div>
     <button class="nav-hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Open menu">
       <span></span><span></span><span></span>
@@ -2406,10 +2422,37 @@ const translations = {
   }
 };
 
-let currentLang = 'en';
+/* ── Auto-detect language from browser ── */
+function detectLang() {
+  const saved = localStorage.getItem('ncr_lang');
+  if (saved && ['en','tr','ru'].includes(saved)) return saved;
+  const nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+  if (nav.startsWith('tr')) return 'tr';
+  if (nav.startsWith('ru') || nav.startsWith('uk') || nav.startsWith('be')) return 'ru';
+  return 'en';
+}
+
+let currentLang = detectLang();
+
+/* helper called from popup language buttons */
+function setPopupLang(lang) {
+  // highlight selected button inside popup
+  ['en','tr','ru'].forEach(l => {
+    const btn = document.getElementById('popupLang' + l.charAt(0).toUpperCase() + l.slice(1));
+    if (!btn) return;
+    const active = l === lang;
+    btn.style.borderColor = active ? 'var(--ocean)' : 'var(--border)';
+    btn.style.background  = active ? 'var(--mist)' : 'var(--white)';
+    btn.querySelector('.opt-label').style.color      = active ? 'var(--ocean)' : 'var(--text)';
+    btn.querySelector('.opt-label').style.fontWeight = active ? '500' : '400';
+  });
+  setLang(lang);
+  localStorage.setItem('ncr_lang', lang);
+}
 
 function setLang(lang) {
   currentLang = lang;
+  localStorage.setItem('ncr_lang', lang);
   const t = translations[lang];
   // update all data-i18n elements
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -2423,7 +2466,7 @@ function setLang(lang) {
   });
   // update lang buttons — all sets
   document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
   });
   // re-render listings with new language strings
   renderListings(window._lastFilters || {});
@@ -2966,7 +3009,9 @@ function closeEditModal() {
 /* ══════════
    INIT — must be last so all functions are defined
 ══════════ */
-setLang('en');
+setLang(currentLang);   // apply auto-detected / saved language
+// sync popup lang selector to match
+setTimeout(() => setPopupLang(currentLang), 0);
 showLoading();
 // Show welcome popup after a brief delay so the hero is visible first
 setTimeout(() => showFilterPopup(), 400);
