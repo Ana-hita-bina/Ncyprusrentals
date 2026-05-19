@@ -1216,8 +1216,8 @@ footer a:hover { color: var(--sky); }
       <div class="filter-step" id="popupLangStep">
         <div class="filter-step-title" style="font-size:13px;">🌐 Choose your language / Dil seçin / Выберите язык</div>
         <div class="option-grid" style="grid-template-columns:repeat(3,1fr);">
-          <div class="option-btn" id="popupLangEn" onclick="setPopupLang('en')" style="border-color:var(--ocean);background:var(--mist);">
-            <div class="opt-icon">🇬🇧</div><div class="opt-label" style="color:var(--ocean);font-weight:500;">English</div>
+          <div class="option-btn active" id="popupLangEn" onclick="setPopupLang('en')">
+            <div class="opt-icon">🇬🇧</div><div class="opt-label">English</div>
           </div>
           <div class="option-btn" id="popupLangTr" onclick="setPopupLang('tr')">
             <div class="opt-icon">🇹🇷</div><div class="opt-label">Türkçe</div>
@@ -2451,15 +2451,10 @@ let currentLang = detectLang();
 
 /* helper called from popup language buttons */
 function setPopupLang(lang) {
-  // highlight selected button inside popup
+  // use .active class only — no inline styles, keeps reset logic uniform
   ['en','tr','ru'].forEach(l => {
     const btn = document.getElementById('popupLang' + l.charAt(0).toUpperCase() + l.slice(1));
-    if (!btn) return;
-    const active = l === lang;
-    btn.style.borderColor = active ? 'var(--ocean)' : 'var(--border)';
-    btn.style.background  = active ? 'var(--mist)' : 'var(--white)';
-    btn.querySelector('.opt-label').style.color      = active ? 'var(--ocean)' : 'var(--text)';
-    btn.querySelector('.opt-label').style.fontWeight = active ? '500' : '400';
+    if (btn) btn.classList.toggle('active', l === lang);
   });
   setLang(lang);
   localStorage.setItem('ncr_lang', lang);
@@ -2710,14 +2705,24 @@ function renderListings(filters = {}) {
    POPUP CONTROL
 ══════════════ */
 function showFilterPopup() {
-  // Reset all filter selections except language every time popup opens
+  // Reset all filter option buttons except language, clear data arrays and budget
   Object.keys(popupFilters).forEach(k => { popupFilters[k] = []; });
   document.querySelectorAll('.option-btn').forEach(b => {
-    // skip the language buttons — they live inside #popupLangStep
-    if (!b.closest('#popupLangStep')) b.classList.remove('active');
+    if (!b.closest('#popupLangStep')) {
+      b.classList.remove('active');
+      // also wipe any leftover inline styles that could fake the active look
+      b.style.borderColor = '';
+      b.style.background  = '';
+    }
   });
   document.getElementById('budgetMin').value = '';
   document.getElementById('budgetMax').value = '';
+
+  // Make sure the correct language button shows as active (class-based, no inline styles)
+  ['en','tr','ru'].forEach(l => {
+    const btn = document.getElementById('popupLang' + l.charAt(0).toUpperCase() + l.slice(1));
+    if (btn) btn.classList.toggle('active', l === currentLang);
+  });
 
   const overlay = document.getElementById('welcomeOverlay');
   overlay.style.display = 'flex';
