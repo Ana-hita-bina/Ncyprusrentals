@@ -1126,7 +1126,22 @@ footer a:hover { color: var(--sky); }
 
   /* POPUP FILTER — slides up from bottom on mobile */
   .overlay { padding: 0; align-items: flex-end; }
-  .popup { border-radius: 20px 20px 0 0; max-height: 92vh; width: 100%; }
+  .overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+  .popup { border-radius: 20px 20px 0 0; max-height: 92vh; width: 100%; position: relative; }
+  .popup::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 2px;
+    margin: 10px auto -6px;
+  }
   .popup-header { padding: 18px 20px 14px; border-radius: 20px 20px 0 0; }
   .popup-header h2 { font-size: 20px; }
   .popup-header p { font-size: 13px; }
@@ -2695,7 +2710,21 @@ function renderListings(filters = {}) {
    POPUP CONTROL
 ══════════════ */
 function showFilterPopup() {
-  document.getElementById('welcomeOverlay').style.display = 'flex';
+  // Reset all filter selections except language every time popup opens
+  Object.keys(popupFilters).forEach(k => { popupFilters[k] = []; });
+  document.querySelectorAll('.option-btn').forEach(b => {
+    // skip the language buttons — they live inside #popupLangStep
+    if (!b.closest('#popupLangStep')) b.classList.remove('active');
+  });
+  document.getElementById('budgetMin').value = '';
+  document.getElementById('budgetMax').value = '';
+
+  const overlay = document.getElementById('welcomeOverlay');
+  overlay.style.display = 'flex';
+
+  // Scroll popup back to top (important on mobile where it slides up from bottom)
+  const popup = overlay.querySelector('.popup');
+  if (popup) popup.scrollTop = 0;
 }
 function closePopup() {
   document.getElementById('welcomeOverlay').style.display = 'none';
@@ -2703,6 +2732,11 @@ function closePopup() {
 document.getElementById('welcomeOverlay').addEventListener('click', function(e) {
   if (e.target === this) closePopup();
 });
+// Prevent background scroll bleed-through on mobile when popup is open
+document.getElementById('welcomeOverlay').addEventListener('touchmove', function(e) {
+  const popup = this.querySelector('.popup');
+  if (popup && !popup.contains(e.target)) e.preventDefault();
+}, { passive: false });
 
 /* ══════════════
    REQUEST FORM — handled by async submitRequest() in Supabase block above
